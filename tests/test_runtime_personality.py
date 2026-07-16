@@ -81,7 +81,7 @@ def test_dialogue_bubble_is_compact_and_cannot_take_focus(monkeypatch: object) -
     bubble = ThoughtBubble(window)
     bubble.show_message("Short line")
     assert bubble.width() < 200
-    assert bubble.height() < 70
+    assert bubble.height() <= 48
     assert bubble.windowFlags() & Qt.WindowType.WindowDoesNotAcceptFocus
     assert bubble.testAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating)
     assert not bubble.grab().isNull()

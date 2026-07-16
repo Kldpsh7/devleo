@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from PySide6.QtCore import QPoint, QRect, Qt, QTimer
-from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QPaintEvent, QPen, QPolygonF
+from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QPaintEvent, QPen
 from PySide6.QtWidgets import QLabel, QWidget
 
 
@@ -18,7 +18,7 @@ class ThoughtBubble(QWidget):
         self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating)
         self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.setFixedSize(160, 58)
+        self.setFixedSize(160, 48)
         self.label = QLabel(self)
         self.label.setWordWrap(True)
         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -27,7 +27,7 @@ class ThoughtBubble(QWidget):
         font.setWeight(QFont.Weight.DemiBold)
         self.label.setFont(font)
         self.label.setStyleSheet("color: #202020; background: transparent;")
-        self.label.setGeometry(12, 7, 136, 38)
+        self.label.setGeometry(10, 5, 140, 38)
         self.hide_timer = QTimer(self, singleShot=True)
         self.hide_timer.timeout.connect(self.hide)
 
@@ -40,9 +40,9 @@ class ThoughtBubble(QWidget):
             Qt.TextFlag.TextWordWrap | Qt.AlignmentFlag.AlignCenter,
             text,
         )
-        height = min(max(text_rect.height() + 23, 48), 92)
+        height = min(max(text_rect.height() + 14, 40), 84)
         self.setFixedSize(width, height)
-        self.label.setGeometry(12, 6, width - 24, height - 17)
+        self.label.setGeometry(10, 4, width - 20, height - 8)
 
     def show_message(self, text: str, duration_ms: int = 4300) -> bool:
         if self.isVisible():
@@ -56,8 +56,8 @@ class ThoughtBubble(QWidget):
     def place_near(self, pet: QRect, screen: QRect) -> None:
         x = pet.center().x() - self.width() // 2
         x = min(max(x, screen.left()), screen.right() - self.width() + 1)
-        above = pet.top() - self.height() + 9
-        y = above if above >= screen.top() else pet.bottom() - 9
+        above = pet.top() - self.height() - 4
+        y = above if above >= screen.top() else pet.bottom() + 4
         y = min(max(y, screen.top()), screen.bottom() - self.height() + 1)
         self.move(QPoint(x, y))
 
@@ -65,19 +65,8 @@ class ThoughtBubble(QWidget):
         del event
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        painter.setPen(QPen(QColor("#252525"), 3))
+        painter.setPen(QPen(QColor("#252525"), 1))
         painter.setBrush(QColor(255, 255, 255, 246))
         path = QPainterPath()
-        body_height = self.height() - 11
-        path.addRoundedRect(3, 3, self.width() - 6, body_height - 3, 17, 17)
+        path.addRoundedRect(1, 1, self.width() - 2, self.height() - 2, 15, 15)
         painter.drawPath(path)
-        tail_x = min(max(self.width() // 4, 24), self.width() - 36)
-        painter.drawPolygon(
-            QPolygonF(
-                [
-                    QPoint(tail_x, body_height - 2),
-                    QPoint(tail_x + 19, body_height - 2),
-                    QPoint(tail_x + 9, self.height() - 2),
-                ]
-            )
-        )
