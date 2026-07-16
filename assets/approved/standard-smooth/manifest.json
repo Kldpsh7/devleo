@@ -13,7 +13,7 @@
     "working": {"frameIntervalMs": 180, "visualQa": "pass"},
     "review": {"frameIntervalMs": 220, "visualQa": "pass"}
   },
-  "openLaptopInvariant": "exterior lid faces viewer; Leo sits behind the unseen screen",
+  "openLaptopInvariant": "exterior lid faces viewer with graphite rim, hinge seam, and paw emblem; Leo sits behind the unseen screen",
   "deterministicInspection": "pass",
   "edgeDespill": "pass"
 }

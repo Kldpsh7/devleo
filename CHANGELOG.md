@@ -19,3 +19,4 @@ All notable changes will be recorded here. The project follows Semantic Versioni
 - Prevented stationary animations and gaze poses from sliding while roaming; selecting Roam now clears manual animation overrides.
 - Strengthened the Working laptop lid with a dark rim, hinge seam, and paw emblem that remain readable at the smallest display scale.
 - Repaired Sleep with a validated eight-frame breathing and animated `Zzz` loop.
+- Rebuilt Waiting, Review, and Focus so every open-laptop state uses the same readable exterior lid construction.
