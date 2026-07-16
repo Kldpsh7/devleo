@@ -10,6 +10,22 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "LicenseRef-Proprietary"}
 authors = [{name = "Lion Cub Pet contributors"}]
+keywords = ["desktop-pet", "lion", "pyside6", "productivity", "mascot"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: MacOS X",
+  "Environment :: Win32 (MS Windows)",
+  "Environment :: X11 Applications :: Qt",
+  "Operating System :: MacOS",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Desktop Environment",
+]
 dependencies = [
   "platformdirs>=4.2",
   "PySide6>=6.7",
@@ -18,10 +34,12 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+  "build>=1.2",
   "mypy>=1.11",
   "pytest>=8.2",
   "pytest-qt>=4.4",
   "ruff>=0.6",
+  "twine>=5.1",
 ]
 
 [project.scripts]

@@ -150,9 +150,7 @@ def parser() -> argparse.ArgumentParser:
     rubber_duck = commands.add_parser("rubber-duck")
     rubber_duck.add_argument("operation", choices=["on", "off", "ask", "status"])
     quiet_hours = commands.add_parser("quiet-hours")
-    quiet_hours.add_argument(
-        "operation", choices=["on", "off", "schedule", "unschedule", "status"]
-    )
+    quiet_hours.add_argument("operation", choices=["on", "off", "schedule", "unschedule", "status"])
     quiet_hours.add_argument("start", nargs="?")
     quiet_hours.add_argument("end", nargs="?")
     dialogue_pack = commands.add_parser("dialogue-pack")

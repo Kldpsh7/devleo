@@ -218,8 +218,7 @@ class PetWindow(QWidget):
         loaded: dict[str, list[QPixmap]] = {}
         for mode, count in CUSTOM_FRAME_COUNTS.items():
             frames = [
-                QPixmap(str(asset_path(f"modes/{mode}/{index:02}.png")))
-                for index in range(count)
+                QPixmap(str(asset_path(f"modes/{mode}/{index:02}.png"))) for index in range(count)
             ]
             if all(not frame.isNull() for frame in frames):
                 loaded[mode] = frames
@@ -603,9 +602,7 @@ class PetWindow(QWidget):
     def advance_pomodoro(self) -> None:
         if not self.config.pomodoro_enabled:
             return
-        self.config.pomodoro_phase = (
-            "break" if self.config.pomodoro_phase == "focus" else "focus"
-        )
+        self.config.pomodoro_phase = "break" if self.config.pomodoro_phase == "focus" else "focus"
         self.resume_pomodoro()
         self.persist_position()
 
@@ -633,9 +630,7 @@ class PetWindow(QWidget):
                 previous = None
         if previous != today:
             self.config.interaction_streak = (
-                self.config.interaction_streak + 1
-                if previous == today - timedelta(days=1)
-                else 1
+                self.config.interaction_streak + 1 if previous == today - timedelta(days=1) else 1
             )
             self.config.last_interaction_date = today.isoformat()
         self.config.mood = min(100, max(0, int(self.config.mood) + mood_delta))

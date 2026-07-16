@@ -20,3 +20,5 @@ All notable changes will be recorded here. The project follows Semantic Versioni
 - Strengthened the Working laptop lid with a dark rim, hinge seam, and paw emblem that remain readable at the smallest display scale.
 - Repaired Sleep with a validated eight-frame breathing and animated `Zzz` loop.
 - Rebuilt Waiting, Review, and Focus so every open-laptop state uses the same readable exterior lid construction.
+- Added a non-destructive full animation showcase plus tray, corner, focus, and multi-monitor regression coverage.
+- Added Windows/Linux package smoke tests, terminal installers, release checksums, and PyPI Trusted Publishing automation.

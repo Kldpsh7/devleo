@@ -56,7 +56,7 @@ Stationary seated states render at 85% of the selected movement size so the cub 
 
 Leo uses shuffled dialogue bags, so a line does not repeat until the current state’s alternatives have been used. Advice appears at a low random frequency and temporarily uses a smooth 8-frame water-offering animation at 280 ms/frame.
 
-The desktop runtime also uses independently validated 8-frame sequences for Idle (230 ms/frame), Wave (180 ms/frame), Jump (160 ms/frame), Waiting (230 ms/frame), Working (180 ms/frame), and Review (220 ms/frame) instead of stretching the fixed-count compatibility atlas rows. Whenever the laptop is open, its exterior lid faces the viewer while Leo sits behind and looks at the unseen screen. The Working lid uses a dark rim, hinge seam, and paw emblem so it remains readable at small scale.
+The desktop runtime also uses independently validated 8-frame sequences for Idle (230 ms/frame), Wave (180 ms/frame), Jump (160 ms/frame), Waiting (230 ms/frame), Working (180 ms/frame), and Review (220 ms/frame) instead of stretching the fixed-count compatibility atlas rows. Whenever the laptop is open, its exterior lid faces the viewer while Leo sits behind and looks at the unseen screen. Waiting, Working, Review, and Focus use a dark rim, hinge seam, and paw emblem so the exterior lid remains readable at small scale.
 
 ### Productivity and interaction systems
 
@@ -86,23 +86,36 @@ Laptop state is part of the animation contract:
 
 The default `full-screen` bounds let visible pet pixels reach all four physical screen corners. Use `bounds work-area` to keep it outside the taskbar or Dock area.
 
-## Installation design
+## Installation
 
-The planned installation path uses `uv` to install the Python package from GitHub. This avoids distributing a downloaded native application bundle while still creating a GUI application entry and optional launch-at-login integration.
+The terminal installer uses `uv` to create an isolated user-level tool environment. It installs `uv` first when needed, then installs Leo, enables user-level autostart, and starts the GUI.
+
+After the public GitHub repository exists, macOS and Linux use one command (replace `<OWNER>` once):
 
 ```bash
-# macOS and Linux
-uv tool install "git+https://github.com/<OWNER>/lion-cub-pet"
-lion-cub-pet install --autostart --start
+curl -LsSf https://raw.githubusercontent.com/<OWNER>/lion-cub-pet/main/install.sh | sh
 ```
+
+Windows PowerShell:
 
 ```powershell
-# Windows PowerShell
-uv tool install "git+https://github.com/<OWNER>/lion-cub-pet"
+irm https://raw.githubusercontent.com/<OWNER>/lion-cub-pet/main/install.ps1 | iex
+```
+
+Before the PyPI release, point the same installer at the Git repository:
+
+```bash
+LEO_PACKAGE_SPEC="git+https://github.com/<OWNER>/lion-cub-pet" sh install.sh
+```
+
+After the PyPI release, direct Python installation also works:
+
+```bash
+python -m pip install lion-cub-pet
 lion-cub-pet install --autostart --start
 ```
 
-The installer will create only user-level files by default. System-wide installation will not be required.
+Set `LEO_AUTOSTART=0` to install and start without launch-at-login. The installers create only user-level files; they do not require administrator privileges.
 
 ## CLI contract
 
@@ -207,6 +220,7 @@ lion-cub-pet play review
 lion-cub-pet look <0-359>
 lion-cub-pet laptop auto|closed|half-open|open
 lion-cub-pet demo
+lion-cub-pet showcase [--seconds-per-state 1.2]
 lion-cub-pet preview <animation>
 ```
 
@@ -224,7 +238,7 @@ Dialogue packs are UTF-8 JSON objects. Keys must match a built-in category and e
 
 Supported categories are `idle`, `working`, `waiting`, `review`, `failure`, `departing`, `clicked`, `relax`, `focus`, `sleep`, `motivate`, `advice`, `pomodoro_focus`, `pomodoro_break`, `rubber_duck`, `victory`, and `treat`.
 
-`play`, `look`, `laptop`, `demo`, and `preview` are explicit overrides intended for testing and demonstrations. `lion-cub-pet play auto` returns control to the state machine.
+`showcase` runs every standard animation, custom mode, advice gesture, and cardinal gaze without changing the saved mode. `play`, `look`, `laptop`, `demo`, and `preview` are explicit overrides intended for testing and demonstrations. `lion-cub-pet play auto` returns control to the state machine.
 
 ### Launch at login
 
@@ -335,7 +349,10 @@ uv run ruff check .
 uv run ruff format --check .
 uv run mypy src
 uv build
+uv run twine check dist/*
 ```
+
+See [Releasing](docs/RELEASING.md) for the GitHub Release, PyPI Trusted Publishing, checksum, and installer process.
 
 ## Graphics quality policy
 
