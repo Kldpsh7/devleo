@@ -31,9 +31,9 @@ def test_custom_mode_frames_have_runtime_geometry() -> None:
             assert (size.width(), size.height()) == (192, 208), (mode, frame)
 
 
-def test_first_smooth_standard_batch_has_runtime_geometry() -> None:
+def test_smooth_standard_overrides_have_runtime_geometry() -> None:
     root = files("lion_cub_pet.assets")
-    for state in ("idle", "wave", "jump"):
+    for state in ("idle", "wave", "jump", "waiting", "working", "review"):
         for frame in range(8):
             reader = QImageReader(str(root.joinpath(f"animations/{state}/{frame:02}.png")))
             size = reader.size()

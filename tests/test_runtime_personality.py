@@ -48,7 +48,7 @@ def test_custom_modes_use_slower_animation_intervals(monkeypatch: object) -> Non
 
 def test_smooth_standard_overrides_load_with_state_specific_timing(monkeypatch: object) -> None:
     window = make_window(monkeypatch)
-    for state in ("idle", "wave", "jump"):
+    for state in ("idle", "wave", "jump", "waiting", "working", "review"):
         assert state in window.animation_frames
         assert window.frame_count(state) == 8
         assert window.animation_interval(state) > runtime.DEFAULT_FRAME_INTERVAL

@@ -15,3 +15,4 @@ All notable changes will be recorded here. The project follows Semantic Versioni
 - Added automatic Pomodoro Focus/Relax cycles, Rubber Duck questions, Victory celebrations, and manual/scheduled Quiet Hours.
 - Added validated JSON dialogue packs plus persisted treats, mood, and daily interaction streaks.
 - Added independently validated 8-frame desktop-runtime overrides for Idle, Wave, and Jump with state-specific timing.
+- Added 8-frame Waiting, Working, and Review overrides; all open-laptop states keep the exterior lid visible toward the viewer.

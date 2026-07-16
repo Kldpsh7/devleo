@@ -8,6 +8,12 @@
     "wave": {"frameIntervalMs": 180, "visualQa": "pass"},
     "jump": {"frameIntervalMs": 160, "visualQa": "pass"}
   },
+  "batch2": {
+    "waiting": {"frameIntervalMs": 230, "visualQa": "pass"},
+    "working": {"frameIntervalMs": 180, "visualQa": "pass"},
+    "review": {"frameIntervalMs": 220, "visualQa": "pass"}
+  },
+  "openLaptopInvariant": "exterior lid faces viewer; Leo sits behind the unseen screen",
   "deterministicInspection": "pass",
   "edgeDespill": "pass"
 }
