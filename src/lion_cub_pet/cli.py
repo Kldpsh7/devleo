@@ -132,6 +132,8 @@ def parser() -> argparse.ArgumentParser:
     add_value_command(commands, "size")
     opacity = commands.add_parser("opacity")
     opacity.add_argument("value", type=float)
+    transparency = commands.add_parser("transparency")
+    transparency.add_argument("value", type=float, help="percentage transparent, from 0 to 75")
     for name in ["always-on-top", "click-through", "avoid-cursor", "dialogues", "advice"]:
         add_value_command(commands, name, ["on", "off"])
     add_value_command(commands, "personality", ["playful"])
@@ -235,6 +237,7 @@ def completion(shell: str) -> str:
         "speed",
         "size",
         "opacity",
+        "transparency",
         "always-on-top",
         "click-through",
         "personality",
@@ -334,6 +337,7 @@ def run(args: argparse.Namespace) -> Any:  # noqa: C901, PLR0911
         "speed",
         "size",
         "opacity",
+        "transparency",
         "always-on-top",
         "click-through",
         "personality",
@@ -353,10 +357,14 @@ def run(args: argparse.Namespace) -> Any:  # noqa: C901, PLR0911
                 value, float(value) if value not in {"slow", "normal", "fast"} else value
             )
         elif command == "size":
-            value = {"small": 0.7, "normal": 1.0, "large": 1.25}.get(
-                value, float(value) if value not in {"small", "normal", "large"} else value
+            value = {"tiny": 0.55, "small": 0.7, "normal": 1.0, "large": 1.25}.get(
+                value,
+                float(value) if value not in {"tiny", "small", "normal", "large"} else value,
             )
             key = "scale"
+        elif command == "transparency":
+            value = 1.0 - min(max(float(value), 0.0), 75.0) / 100.0
+            key = "opacity"
         elif command in {"always-on-top", "click-through", "avoid-cursor", "dialogues", "advice"}:
             value = value == "on"
         elif command in {"idle-delay", "opacity"}:

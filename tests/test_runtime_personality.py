@@ -3,6 +3,7 @@ from PySide6.QtGui import QContextMenuEvent, QMouseEvent
 from PySide6.QtWidgets import QApplication, QMenu
 
 import lion_cub_pet.runtime as runtime
+from lion_cub_pet.bubble import ThoughtBubble
 from lion_cub_pet.config import PetConfig
 
 
@@ -41,6 +42,28 @@ def test_size_is_clamped_to_safe_range(monkeypatch: object) -> None:
     assert window.config.scale == runtime.MAX_SCALE
     window.handle({"action": "set", "key": "scale", "value": 0.1})
     assert window.config.scale == runtime.MIN_SCALE
+    window.close()
+
+
+def test_opacity_is_clamped_to_usable_range(monkeypatch: object) -> None:
+    window = make_window(monkeypatch)
+    window.handle({"action": "set", "key": "opacity", "value": 2.0})
+    assert window.config.opacity == runtime.MAX_OPACITY
+    window.handle({"action": "set", "key": "opacity", "value": 0.0})
+    assert window.config.opacity == runtime.MIN_OPACITY
+    window.close()
+
+
+def test_dialogue_bubble_is_compact_and_cannot_take_focus(monkeypatch: object) -> None:
+    window = make_window(monkeypatch)
+    bubble = ThoughtBubble(window)
+    bubble.show_message("Short line")
+    assert bubble.width() < 200
+    assert bubble.height() < 70
+    assert bubble.windowFlags() & Qt.WindowType.WindowDoesNotAcceptFocus
+    assert bubble.testAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating)
+    assert not bubble.grab().isNull()
+    bubble.close()
     window.close()
 
 

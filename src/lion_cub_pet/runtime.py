@@ -32,8 +32,10 @@ from lion_cub_pet.ipc import SERVER_NAME
 
 CELL = QSize(192, 208)
 DISPLAY_NAME = "Leo the Dev"
-MIN_SCALE = 0.7
+MIN_SCALE = 0.55
 MAX_SCALE = 1.25
+MIN_OPACITY = 0.25
+MAX_OPACITY = 1.0
 FRAME_COUNTS = {0: 6, 1: 8, 2: 8, 3: 4, 4: 5, 5: 8, 6: 6, 7: 6, 8: 6, 9: 8, 10: 8}
 CUSTOM_FRAME_COUNTS = {"relax": 6, "focus": 6, "sleep": 6, "motivate": 4, "advice": 6}
 CUSTOM_FALLBACKS = {
@@ -109,7 +111,8 @@ class PetWindow(QWidget):
         self.label.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         self.bubble = ThoughtBubble(self)
         self.apply_size()
-        self.setWindowOpacity(config.opacity)
+        self.config.opacity = min(max(float(config.opacity), MIN_OPACITY), MAX_OPACITY)
+        self.setWindowOpacity(self.config.opacity)
         self.restore_position()
         self.animation_timer = QTimer(self, interval=110)
         self.animation_timer.timeout.connect(self.advance_frame)
@@ -601,7 +604,8 @@ class PetWindow(QWidget):
                 self.apply_size()
                 self.restore_position()
             elif command["key"] == "opacity":
-                self.setWindowOpacity(float(value))
+                self.config.opacity = min(max(float(value), MIN_OPACITY), MAX_OPACITY)
+                self.setWindowOpacity(self.config.opacity)
             elif command["key"] == "bounds":
                 self.restore_position()
             elif command["key"] == "dialogues" and not bool(value):
@@ -682,6 +686,15 @@ class PetWindow(QWidget):
                 "mode_assets": sorted(self.mode_frames),
                 "dialogue_visible": self.bubble.isVisible(),
                 "dialogue_text": self.bubble.label.text() if self.bubble.isVisible() else None,
+                "dialogue_window": [
+                    self.bubble.x(),
+                    self.bubble.y(),
+                    self.bubble.width(),
+                    self.bubble.height(),
+                ],
+                "dialogue_accepts_focus": not bool(
+                    self.bubble.windowFlags() & Qt.WindowType.WindowDoesNotAcceptFocus
+                ),
                 "context_menu_open_count": self.context_menu_open_count,
             },
         }
@@ -796,7 +809,7 @@ class PetApplication(QApplication):
             add_action(mode_menu, label, "mode", mode)
 
         size_menu = menu.addMenu("Size")
-        for label, scale in [("Small", 0.75), ("Normal", 1.0), ("Large", 1.2)]:
+        for label, scale in [("Tiny", 0.55), ("Small", 0.75), ("Normal", 1.0), ("Large", 1.2)]:
             item = QAction(label, size_menu)
             item.triggered.connect(
                 lambda _checked=False, value=scale: self.window.handle(
@@ -804,6 +817,21 @@ class PetApplication(QApplication):
                 )
             )
             size_menu.addAction(item)
+
+        transparency_menu = menu.addMenu("Transparency")
+        for label, opacity in [
+            ("Opaque", 1.0),
+            ("Slight — 15%", 0.85),
+            ("Medium — 35%", 0.65),
+            ("Ghost — 60%", 0.4),
+        ]:
+            item = QAction(label, transparency_menu)
+            item.triggered.connect(
+                lambda _checked=False, value=opacity: self.window.handle(
+                    {"action": "set", "key": "opacity", "value": value}
+                )
+            )
+            transparency_menu.addAction(item)
 
         personality_menu = menu.addMenu("Personality")
         for label, key, enabled in [

@@ -8,6 +8,8 @@ def test_all_documented_command_groups_parse() -> None:
         ["move", "10", "20"],
         ["speed", "fast"],
         ["size", "1.2"],
+        ["size", "tiny"],
+        ["transparency", "35"],
         ["mode", "focus"],
         ["dialogues", "off"],
         ["say", "hello", "human"],
