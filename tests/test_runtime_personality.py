@@ -46,6 +46,15 @@ def test_custom_modes_use_slower_animation_intervals(monkeypatch: object) -> Non
     window.close()
 
 
+def test_smooth_standard_overrides_load_with_state_specific_timing(monkeypatch: object) -> None:
+    window = make_window(monkeypatch)
+    for state in ("idle", "wave", "jump"):
+        assert state in window.animation_frames
+        assert window.frame_count(state) == 8
+        assert window.animation_interval(state) > runtime.DEFAULT_FRAME_INTERVAL
+    window.close()
+
+
 def test_motivate_returns_to_normal_only_for_current_generation(monkeypatch: object) -> None:
     window = make_window(monkeypatch)
     window.handle({"action": "mode", "value": "motivate"})
@@ -54,7 +63,7 @@ def test_motivate_returns_to_normal_only_for_current_generation(monkeypatch: obj
     assert window.config.mode == "motivate"
     window.finish_motivate(generation)
     assert window.config.mode == "normal"
-    assert window.animation_timer.interval() == runtime.DEFAULT_FRAME_INTERVAL
+    assert window.animation_timer.interval() == runtime.FRAME_INTERVALS["idle"]
     window.close()
 
 

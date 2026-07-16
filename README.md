@@ -56,6 +56,8 @@ Stationary seated states render at 85% of the selected movement size so the cub 
 
 Leo uses shuffled dialogue bags, so a line does not repeat until the current state’s alternatives have been used. Advice appears at a low random frequency and temporarily uses a smooth 8-frame water-offering animation at 280 ms/frame.
 
+The desktop runtime also uses independently validated 8-frame Idle (230 ms/frame), Wave (180 ms/frame), and Jump (160 ms/frame) sequences instead of stretching the fixed-count compatibility atlas rows.
+
 ### Productivity and interaction systems
 
 - `Pomodoro` alternates configurable Focus and Relax phases; the default cycle is 25/5 minutes.

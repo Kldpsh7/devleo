@@ -1,0 +1,13 @@
+{
+  "displayName": "Leo the Dev",
+  "cell": {"width": 192, "height": 208},
+  "framesPerState": 8,
+  "chromaKey": "#00FFFF",
+  "batch1": {
+    "idle": {"frameIntervalMs": 230, "visualQa": "pass"},
+    "wave": {"frameIntervalMs": 180, "visualQa": "pass"},
+    "jump": {"frameIntervalMs": 160, "visualQa": "pass"}
+  },
+  "deterministicInspection": "pass",
+  "edgeDespill": "pass"
+}

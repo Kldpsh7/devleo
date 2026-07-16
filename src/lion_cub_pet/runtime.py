@@ -39,7 +39,26 @@ MIN_OPACITY = 0.25
 MAX_OPACITY = 1.0
 FRAME_COUNTS = {0: 6, 1: 8, 2: 8, 3: 4, 4: 5, 5: 8, 6: 6, 7: 6, 8: 6, 9: 8, 10: 8}
 CUSTOM_FRAME_COUNTS = {"relax": 8, "focus": 8, "sleep": 8, "motivate": 8, "advice": 8}
+SMOOTH_FRAME_COUNTS = {
+    "idle": 8,
+    "wave": 8,
+    "jump": 8,
+    "waiting": 8,
+    "working": 8,
+    "review": 8,
+}
 FRAME_INTERVALS = {
+    "idle": 230,
+    "walk": 130,
+    "walk-right": 130,
+    "walk-left": 130,
+    "wave": 180,
+    "jump": 160,
+    "failure": 190,
+    "waiting": 230,
+    "working": 180,
+    "run": 180,
+    "review": 220,
     "relax": 260,
     "focus": 210,
     "sleep": 360,
@@ -106,6 +125,7 @@ class PetWindow(QWidget):
         self.atlas = QPixmap(str(asset_path("spritesheet.webp")))
         self.concept = QPixmap(str(asset_path("byte-approved-concept.png")))
         self.mode_frames = self.load_mode_frames()
+        self.animation_frames = self.load_animation_frames()
         try:
             self.dialogue_deck = DialogueDeck(load_dialogue_pack(config.dialogue_pack))
         except (OSError, ValueError, json.JSONDecodeError):
@@ -175,15 +195,31 @@ class PetWindow(QWidget):
                 loaded[mode] = frames
         return loaded
 
+    def load_animation_frames(self) -> dict[str, list[QPixmap]]:
+        loaded: dict[str, list[QPixmap]] = {}
+        for animation, count in SMOOTH_FRAME_COUNTS.items():
+            frames = [
+                QPixmap(str(asset_path(f"animations/{animation}/{index:02}.png")))
+                for index in range(count)
+            ]
+            if all(not frame.isNull() for frame in frames):
+                loaded[animation] = frames
+        return loaded
+
     def frame_count(self, animation: str) -> int:
         if animation.startswith("look-"):
             return 8
+        if animation in self.animation_frames:
+            return len(self.animation_frames[animation])
         if animation in CUSTOM_FRAME_COUNTS:
             return CUSTOM_FRAME_COUNTS[animation]
         return FRAME_COUNTS[ANIMATION_ROWS.get(animation, 0)]
 
     def animation_interval(self, animation: str | None = None) -> int:
-        return FRAME_INTERVALS.get(animation or self.active_animation, DEFAULT_FRAME_INTERVAL)
+        name = animation or self.active_animation
+        if name.startswith("look-"):
+            return 200
+        return FRAME_INTERVALS.get(name, DEFAULT_FRAME_INTERVAL)
 
     def source_pixmap(self, animation: str, frame: int) -> QPixmap:
         if animation.startswith("look-"):
@@ -194,6 +230,9 @@ class PetWindow(QWidget):
                 CELL.width(),
                 CELL.height(),
             )
+        smooth = self.animation_frames.get(animation)
+        if smooth:
+            return smooth[frame % len(smooth)]
         custom = self.mode_frames.get(animation)
         if custom:
             return custom[frame % len(custom)]
@@ -909,6 +948,7 @@ class PetWindow(QWidget):
                     "native": bool(app.property("nativeApplicationIconApplied")),
                 },
                 "mode_assets": sorted(self.mode_frames),
+                "smooth_animation_assets": sorted(self.animation_frames),
                 "dialogue_visible": self.bubble.isVisible(),
                 "dialogue_text": self.bubble.label.text() if self.bubble.isVisible() else None,
                 "dialogue_window": [

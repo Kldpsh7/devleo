@@ -14,3 +14,4 @@ All notable changes will be recorded here. The project follows Semantic Versioni
 - Motivate now returns to Normal after a randomized 5–8 seconds without overriding a later manual mode selection.
 - Added automatic Pomodoro Focus/Relax cycles, Rubber Duck questions, Victory celebrations, and manual/scheduled Quiet Hours.
 - Added validated JSON dialogue packs plus persisted treats, mood, and daily interaction streaks.
+- Added independently validated 8-frame desktop-runtime overrides for Idle, Wave, and Jump with state-specific timing.
