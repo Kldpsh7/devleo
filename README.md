@@ -56,7 +56,7 @@ Stationary seated states render at 85% of the selected movement size so the cub 
 
 Leo uses shuffled dialogue bags, so a line does not repeat until the current state’s alternatives have been used. Advice appears at a low random frequency and temporarily uses a smooth 8-frame water-offering animation at 280 ms/frame.
 
-The desktop runtime also uses independently validated 8-frame sequences for Idle (230 ms/frame), Wave (180 ms/frame), Jump (160 ms/frame), Waiting (230 ms/frame), Working (180 ms/frame), and Review (220 ms/frame) instead of stretching the fixed-count compatibility atlas rows. Whenever the laptop is open, its exterior lid faces the viewer while Leo sits behind and looks at the unseen screen.
+The desktop runtime also uses independently validated 8-frame sequences for Idle (230 ms/frame), Wave (180 ms/frame), Jump (160 ms/frame), Waiting (230 ms/frame), Working (180 ms/frame), and Review (220 ms/frame) instead of stretching the fixed-count compatibility atlas rows. Whenever the laptop is open, its exterior lid faces the viewer while Leo sits behind and looks at the unseen screen. The Working lid uses a dark rim, hinge seam, and paw emblem so it remains readable at small scale.
 
 ### Productivity and interaction systems
 

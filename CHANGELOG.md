@@ -16,3 +16,6 @@ All notable changes will be recorded here. The project follows Semantic Versioni
 - Added validated JSON dialogue packs plus persisted treats, mood, and daily interaction streaks.
 - Added independently validated 8-frame desktop-runtime overrides for Idle, Wave, and Jump with state-specific timing.
 - Added 8-frame Waiting, Working, and Review overrides; all open-laptop states keep the exterior lid visible toward the viewer.
+- Prevented stationary animations and gaze poses from sliding while roaming; selecting Roam now clears manual animation overrides.
+- Strengthened the Working laptop lid with a dark rim, hinge seam, and paw emblem that remain readable at the smallest display scale.
+- Repaired Sleep with a validated eight-frame breathing and animated `Zzz` loop.

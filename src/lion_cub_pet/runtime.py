@@ -84,6 +84,7 @@ STATIONARY_ANIMATIONS = {
     "motivate",
     "advice",
 }
+ROAMING_ANIMATIONS = {"walk", "walk-right", "walk-left"}
 ANIMATION_ROWS = {
     "idle": 0,
     "walk": 1,
@@ -653,6 +654,11 @@ class PetWindow(QWidget):
             or self.config.movement != "roam"
             or self.config.mode != "normal"
             or self.temporary_animation is not None
+            or self.look_override is not None
+            or (
+                self.config.animation != "auto"
+                and self.current_animation() not in ROAMING_ANIMATIONS
+            )
             or self.dragging
         ):
             return
@@ -740,6 +746,8 @@ class PetWindow(QWidget):
             self.config.pomodoro_enabled = False
             self.pomodoro_timer.stop()
             self.config.movement = action
+            if action == "roam":
+                self.config.animation = "auto"
             self.set_mode("normal", speak=False)
             self.config.anchor = "none"
             self.update_label_geometry()

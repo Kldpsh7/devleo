@@ -55,6 +55,46 @@ def test_smooth_standard_overrides_load_with_state_specific_timing(monkeypatch: 
     window.close()
 
 
+def test_manual_stationary_animation_does_not_roam(monkeypatch: object) -> None:
+    window = make_window(monkeypatch, PetConfig(movement="roam", animation="working"))
+    window.target = window.pos() + QPoint(100, 0)
+    before = window.pos()
+    window.move_tick()
+    assert window.pos() == before
+    window.close()
+
+
+def test_gaze_override_does_not_roam(monkeypatch: object) -> None:
+    window = make_window(monkeypatch, PetConfig(movement="roam"))
+    window.target = window.pos() + QPoint(100, 0)
+    window.look_override = (9, 0)
+    before = window.pos()
+    window.move_tick()
+    assert window.pos() == before
+    window.close()
+
+
+def test_auto_roaming_can_leave_idle(monkeypatch: object) -> None:
+    window = make_window(
+        monkeypatch,
+        PetConfig(movement="roam", animation="auto", x=0, y=0),
+    )
+    window.target = None
+    window.wait_until = 0.0
+    window.move_tick()
+    assert window.target is not None
+    window.close()
+
+
+def test_roam_clears_manual_stationary_animation(monkeypatch: object) -> None:
+    window = make_window(monkeypatch, PetConfig(movement="stay", animation="working"))
+    window.handle({"action": "roam"})
+    assert window.config.movement == "roam"
+    assert window.config.animation == "auto"
+    assert window.config.mode == "normal"
+    window.close()
+
+
 def test_motivate_returns_to_normal_only_for_current_generation(monkeypatch: object) -> None:
     window = make_window(monkeypatch)
     window.handle({"action": "mode", "value": "motivate"})
