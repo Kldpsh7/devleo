@@ -207,6 +207,25 @@ def test_corner_anchors_align_visible_pixels_with_screen(monkeypatch: object) ->
     window.close()
 
 
+def test_anchor_from_roaming_syncs_stationary_frame_before_positioning(
+    monkeypatch: object,
+) -> None:
+    window = make_window(
+        monkeypatch,
+        PetConfig(movement="roam", animation="auto", x=100, y=100),
+    )
+    window.target = QPoint(500, 100)
+    window.active_animation = "walk-right"
+    window.frame = 0
+    window.render_frame()
+    window.handle({"action": "anchor", "value": "top-left"})
+    visible = window.scaled_content_rect().translated(window.pos())
+    assert window.active_animation == "idle"
+    assert visible.left() == window.work_area().left()
+    assert visible.top() == window.work_area().top()
+    window.close()
+
+
 def test_right_click_opens_shared_menu(monkeypatch: object) -> None:
     window = make_window(monkeypatch)
     assert window.label.testAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)

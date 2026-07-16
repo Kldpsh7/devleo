@@ -391,6 +391,7 @@ class PetWindow(QWidget):
             self.target = None
             self.config.anchor = anchor
             self.config.movement = "stay"
+            self.sync_current_animation()
             self.update_label_geometry()
             self.move(self.anchor_position(anchor))
             self.persist_position()
@@ -411,6 +412,19 @@ class PetWindow(QWidget):
         if self.config.movement == "roam" and self.target is not None:
             return "walk-right" if self.target.x() >= self.x() else "walk-left"
         return "idle"
+
+    def sync_current_animation(self) -> None:
+        if self.look_override is not None:
+            self.row, self.frame = self.look_override
+            animation = f"look-{self.row}"
+        else:
+            animation = self.current_animation()
+            self.frame = 0
+            self.row = ANIMATION_ROWS.get(CUSTOM_FALLBACKS.get(animation, animation), -1)
+        self.active_animation = animation
+        if hasattr(self, "animation_timer"):
+            self.animation_timer.setInterval(self.animation_interval(animation))
+        self.render_frame()
 
     def advance_frame(self) -> None:
         if self.config.paused:
@@ -808,6 +822,7 @@ class PetWindow(QWidget):
         else:
             self.config.anchor = "none"
             self.config.movement = "stay"
+            self.sync_current_animation()
             self.update_label_geometry()
             self.move(self.clamp(self.pos()))
             self.persist_position()
@@ -929,6 +944,7 @@ class PetWindow(QWidget):
             if value == "current":
                 self.config.anchor = "current"
                 self.config.movement = "stay"
+                self.sync_current_animation()
                 self.persist_position()
             else:
                 self.apply_anchor(str(value))
@@ -940,6 +956,7 @@ class PetWindow(QWidget):
                 raise ValueError("move requires [x, y]")
             self.config.anchor = "none"
             self.config.movement = "stay"
+            self.sync_current_animation()
             self.update_label_geometry()
             self.move(self.clamp(QPoint(int(value[0]), int(value[1]))))
         elif action == "screen":
