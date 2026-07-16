@@ -11,7 +11,7 @@ from platformdirs import user_config_dir, user_log_dir, user_runtime_dir
 
 @dataclass(slots=True)
 class PetConfig:
-    schema_version: int = 1
+    schema_version: int = 2
     visible: bool = True
     paused: bool = False
     movement: str = "roam"
@@ -32,6 +32,22 @@ class PetConfig:
     advice: bool = True
     advice_min_interval: float = 240.0
     advice_max_interval: float = 480.0
+    pomodoro_enabled: bool = False
+    pomodoro_phase: str = "focus"
+    pomodoro_focus_minutes: float = 25.0
+    pomodoro_break_minutes: float = 5.0
+    rubber_duck_enabled: bool = False
+    rubber_duck_min_interval: float = 600.0
+    rubber_duck_max_interval: float = 1200.0
+    quiet_hours_enabled: bool = False
+    quiet_schedule_enabled: bool = False
+    quiet_hours_start: str = "22:00"
+    quiet_hours_end: str = "08:00"
+    dialogue_pack: str | None = None
+    treats: int = 0
+    mood: int = 60
+    interaction_streak: int = 0
+    last_interaction_date: str | None = None
     bounds: str = "full-screen"
     idle_delay: float = 4.0
     run_chance: int = 35
@@ -69,7 +85,9 @@ def load_config() -> PetConfig:
         return PetConfig()
     raw = json.loads(path.read_text(encoding="utf-8"))
     allowed = {field.name for field in fields(PetConfig)}
-    return PetConfig(**{key: value for key, value in raw.items() if key in allowed})
+    config = PetConfig(**{key: value for key, value in raw.items() if key in allowed})
+    config.schema_version = PetConfig().schema_version
+    return config
 
 
 def save_config(config: PetConfig) -> None:

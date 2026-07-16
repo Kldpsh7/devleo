@@ -7,6 +7,7 @@ import random
 import sys
 import time
 from ctypes import c_void_p
+from datetime import date, datetime, timedelta
 from importlib.resources import files
 from pathlib import Path
 from typing import Any
@@ -27,7 +28,7 @@ from PySide6.QtWidgets import QApplication, QLabel, QMenu, QSystemTrayIcon, QWid
 
 from lion_cub_pet.bubble import ThoughtBubble
 from lion_cub_pet.config import PetConfig, load_config, log_path, save_config
-from lion_cub_pet.dialogues import DialogueDeck
+from lion_cub_pet.dialogues import DialogueDeck, load_dialogue_pack
 from lion_cub_pet.ipc import SERVER_NAME
 
 CELL = QSize(192, 208)
@@ -105,9 +106,15 @@ class PetWindow(QWidget):
         self.atlas = QPixmap(str(asset_path("spritesheet.webp")))
         self.concept = QPixmap(str(asset_path("byte-approved-concept.png")))
         self.mode_frames = self.load_mode_frames()
-        self.dialogue_deck = DialogueDeck()
+        try:
+            self.dialogue_deck = DialogueDeck(load_dialogue_pack(config.dialogue_pack))
+        except (OSError, ValueError, json.JSONDecodeError):
+            logging.exception("failed to load dialogue pack; using built-in lines")
+            self.dialogue_deck = DialogueDeck()
+            self.config.dialogue_pack = None
         self.last_spoken_at = 0.0
         self.temporary_animation: str | None = None
+        self.temporary_generation = 0
         self.mode_generation = 0
         flags = Qt.WindowType.FramelessWindowHint | Qt.WindowType.Tool
         if config.always_on_top:
@@ -135,7 +142,15 @@ class PetWindow(QWidget):
         self.advice_timer = QTimer(self, singleShot=True)
         self.advice_timer.timeout.connect(self.trigger_advice)
         self.schedule_advice()
+        self.pomodoro_timer = QTimer(self, singleShot=True)
+        self.pomodoro_timer.timeout.connect(self.advance_pomodoro)
+        self.rubber_duck_timer = QTimer(self, singleShot=True)
+        self.rubber_duck_timer.timeout.connect(self.trigger_rubber_duck)
+        if self.config.rubber_duck_enabled:
+            self.schedule_rubber_duck()
         self.render_frame()
+        if self.config.pomodoro_enabled:
+            QTimer.singleShot(0, self.resume_pomodoro)
         QTimer.singleShot(0, self.apply_platform_window_policy)
 
     def apply_size(self) -> None:
@@ -391,8 +406,28 @@ class PetWindow(QWidget):
             return "departing"
         return CUSTOM_FALLBACKS.get(animation, animation)
 
+    @staticmethod
+    def clock_minutes(value: str) -> int:
+        try:
+            parsed = datetime.strptime(value, "%H:%M")
+        except ValueError as error:
+            raise ValueError(f"invalid time {value!r}; expected HH:MM") from error
+        return parsed.hour * 60 + parsed.minute
+
+    def quiet_hours_active(self) -> bool:
+        if self.config.quiet_hours_enabled:
+            return True
+        if not self.config.quiet_schedule_enabled:
+            return False
+        start = self.clock_minutes(self.config.quiet_hours_start)
+        end = self.clock_minutes(self.config.quiet_hours_end)
+        now = datetime.now().hour * 60 + datetime.now().minute
+        if start == end:
+            return True
+        return start <= now < end if start < end else now >= start or now < end
+
     def speak(self, category: str, duration_ms: int = 4300, force: bool = False) -> bool:
-        if not self.config.dialogues:
+        if not self.config.dialogues or self.quiet_hours_active():
             return False
         if not force and time.monotonic() - self.last_spoken_at < 10.0:
             return False
@@ -411,26 +446,128 @@ class PetWindow(QWidget):
         high = max(low, float(self.config.advice_max_interval))
         self.advice_timer.start(round(random.uniform(low, high) * 1000))
 
+    def set_mode(self, mode: str, *, speak: bool = True) -> None:
+        if mode not in {"normal", *CUSTOM_FRAME_COUNTS} - {"advice"}:
+            raise ValueError(f"unknown mode: {mode}")
+        self.config.mode = mode
+        self.mode_generation += 1
+        self.temporary_generation += 1
+        self.temporary_animation = None
+        self.look_override = None
+        self.target = None
+        self.active_animation = "idle" if mode == "normal" else mode
+        self.animation_timer.setInterval(self.animation_interval(self.active_animation))
+        self.frame = 0
+        self.render_frame()
+        if mode != "normal" and speak:
+            self.speak(mode, force=True)
+        if mode == "motivate":
+            generation = self.mode_generation
+            QTimer.singleShot(
+                round(random.uniform(5.0, 8.0) * 1000),
+                lambda: self.finish_motivate(generation),
+            )
+
+    def start_temporary_animation(
+        self,
+        animation: str,
+        duration_ms: int,
+        category: str | None = None,
+    ) -> int:
+        self.temporary_generation += 1
+        generation = self.temporary_generation
+        self.temporary_animation = animation
+        self.look_override = None
+        self.target = None
+        self.active_animation = animation
+        self.animation_timer.setInterval(self.animation_interval(animation))
+        self.frame = 0
+        self.render_frame()
+        if category is not None:
+            self.speak(category, min(duration_ms, 6000), force=True)
+        QTimer.singleShot(duration_ms, lambda: self.finish_temporary_animation(generation))
+        return generation
+
+    def set_temporary_phase(self, generation: int, animation: str) -> None:
+        if generation != self.temporary_generation or self.temporary_animation is None:
+            return
+        self.temporary_animation = animation
+        self.active_animation = animation
+        self.animation_timer.setInterval(self.animation_interval(animation))
+        self.frame = 0
+        self.render_frame()
+
+    def finish_temporary_animation(self, generation: int) -> None:
+        if generation != self.temporary_generation:
+            return
+        self.temporary_animation = None
+        self.active_animation = self.current_animation()
+        self.animation_timer.setInterval(self.animation_interval(self.active_animation))
+        self.frame = 0
+        self.render_frame()
+
     def trigger_advice(self) -> None:
         if self.config.advice and self.config.mode not in {"sleep", "focus"}:
-            self.temporary_animation = "advice"
-            self.look_override = None
-            self.target = None
-            self.active_animation = "advice"
-            self.animation_timer.setInterval(self.animation_interval("advice"))
-            self.frame = 0
-            self.render_frame()
-            self.speak("advice", 6000, force=True)
-            QTimer.singleShot(6500, self.finish_advice)
+            self.start_temporary_animation("advice", 6500, "advice")
         self.schedule_advice()
 
     def finish_advice(self) -> None:
         if self.temporary_animation == "advice":
-            self.temporary_animation = None
-            self.active_animation = self.current_animation()
-            self.animation_timer.setInterval(self.animation_interval(self.active_animation))
-            self.frame = 0
-            self.render_frame()
+            self.finish_temporary_animation(self.temporary_generation)
+
+    def resume_pomodoro(self) -> None:
+        phase = self.config.pomodoro_phase
+        if phase not in {"focus", "break"}:
+            phase = "focus"
+            self.config.pomodoro_phase = phase
+        self.set_mode("focus" if phase == "focus" else "relax", speak=False)
+        self.speak(f"pomodoro_{phase}", force=True)
+        minutes = (
+            self.config.pomodoro_focus_minutes
+            if phase == "focus"
+            else self.config.pomodoro_break_minutes
+        )
+        self.pomodoro_timer.start(round(max(0.05, float(minutes)) * 60_000))
+
+    def advance_pomodoro(self) -> None:
+        if not self.config.pomodoro_enabled:
+            return
+        self.config.pomodoro_phase = (
+            "break" if self.config.pomodoro_phase == "focus" else "focus"
+        )
+        self.resume_pomodoro()
+        self.persist_position()
+
+    def schedule_rubber_duck(self) -> None:
+        low = max(60.0, float(self.config.rubber_duck_min_interval))
+        high = max(low, float(self.config.rubber_duck_max_interval))
+        self.rubber_duck_timer.start(round(random.uniform(low, high) * 1000))
+
+    def trigger_rubber_duck(self, *, manual: bool = False) -> None:
+        if (manual or self.config.rubber_duck_enabled) and self.config.mode not in {
+            "sleep",
+            "focus",
+        }:
+            self.start_temporary_animation("review", 6500, "rubber_duck")
+        if self.config.rubber_duck_enabled:
+            self.schedule_rubber_duck()
+
+    def record_interaction(self, mood_delta: int) -> None:
+        today = date.today()
+        previous: date | None = None
+        if self.config.last_interaction_date:
+            try:
+                previous = date.fromisoformat(self.config.last_interaction_date)
+            except ValueError:
+                previous = None
+        if previous != today:
+            self.config.interaction_streak = (
+                self.config.interaction_streak + 1
+                if previous == today - timedelta(days=1)
+                else 1
+            )
+            self.config.last_interaction_date = today.isoformat()
+        self.config.mood = min(100, max(0, int(self.config.mood) + mood_delta))
 
     def position_bubble(self) -> None:
         if not hasattr(self, "bubble"):
@@ -530,7 +667,9 @@ class PetWindow(QWidget):
             return
         self.dragging = False
         if not self.drag_moved:
+            self.record_interaction(1)
             self.speak("clicked", force=True)
+            self.persist_position()
             event.accept()
             return
         bottom_right = self.anchor_position("bottom-right")
@@ -559,39 +698,99 @@ class PetWindow(QWidget):
         elif action in {"pause", "resume"}:
             self.config.paused = action == "pause"
         elif action in {"roam", "stay"}:
+            self.config.pomodoro_enabled = False
+            self.pomodoro_timer.stop()
             self.config.movement = action
-            self.config.mode = "normal"
+            self.set_mode("normal", speak=False)
             self.config.anchor = "none"
             self.update_label_geometry()
             self.target = None
         elif action == "mode":
             mode = str(value)
-            if mode not in {"normal", *CUSTOM_FRAME_COUNTS} - {"advice"}:
-                raise ValueError(f"unknown mode: {mode}")
-            self.config.mode = mode
-            self.mode_generation += 1
-            self.temporary_animation = None
-            self.look_override = None
-            self.target = None
-            self.active_animation = "idle" if mode == "normal" else mode
-            self.animation_timer.setInterval(self.animation_interval(self.active_animation))
-            self.frame = 0
-            self.render_frame()
-            if mode != "normal":
-                self.speak(mode, force=True)
-            if mode == "motivate":
-                generation = self.mode_generation
-                QTimer.singleShot(
-                    round(random.uniform(5.0, 8.0) * 1000),
-                    lambda: self.finish_motivate(generation),
-                )
+            self.config.pomodoro_enabled = False
+            self.pomodoro_timer.stop()
+            self.set_mode(mode)
         elif action == "say":
             if not isinstance(value, str) or not value.strip():
                 raise ValueError("say requires text")
-            self.position_bubble()
-            self.bubble.show_message(value.strip(), 5000)
+            if not self.quiet_hours_active():
+                self.position_bubble()
+                self.bubble.show_message(value.strip(), 5000)
         elif action == "advice-now":
             self.trigger_advice()
+        elif action == "pomodoro":
+            operation = str(value)
+            if operation == "start":
+                focus = command.get("focus")
+                break_minutes = command.get("break_minutes")
+                if focus is not None:
+                    self.config.pomodoro_focus_minutes = max(0.05, float(focus))
+                if break_minutes is not None:
+                    self.config.pomodoro_break_minutes = max(0.05, float(break_minutes))
+                self.config.pomodoro_enabled = True
+                self.config.pomodoro_phase = "focus"
+                self.resume_pomodoro()
+            elif operation == "stop":
+                self.config.pomodoro_enabled = False
+                self.pomodoro_timer.stop()
+                self.config.pomodoro_phase = "focus"
+                self.set_mode("normal", speak=False)
+            elif operation != "status":
+                raise ValueError(f"unknown pomodoro operation: {operation}")
+        elif action == "rubber-duck":
+            operation = str(value)
+            if operation == "on":
+                self.config.rubber_duck_enabled = True
+                self.schedule_rubber_duck()
+            elif operation == "off":
+                self.config.rubber_duck_enabled = False
+                self.rubber_duck_timer.stop()
+            elif operation == "ask":
+                self.trigger_rubber_duck(manual=True)
+            elif operation != "status":
+                raise ValueError(f"unknown rubber-duck operation: {operation}")
+        elif action == "victory":
+            generation = self.start_temporary_animation("jump", 5200, "victory")
+            QTimer.singleShot(1800, lambda: self.set_temporary_phase(generation, "wave"))
+        elif action == "quiet-hours":
+            operation = str(value)
+            if operation == "on":
+                self.config.quiet_hours_enabled = True
+                self.bubble.hide()
+            elif operation == "off":
+                self.config.quiet_hours_enabled = False
+            elif operation == "schedule":
+                start = str(command.get("start"))
+                end = str(command.get("end"))
+                self.clock_minutes(start)
+                self.clock_minutes(end)
+                self.config.quiet_hours_start = start
+                self.config.quiet_hours_end = end
+                self.config.quiet_schedule_enabled = True
+                if self.quiet_hours_active():
+                    self.bubble.hide()
+            elif operation == "unschedule":
+                self.config.quiet_schedule_enabled = False
+            elif operation != "status":
+                raise ValueError(f"unknown quiet-hours operation: {operation}")
+        elif action == "dialogue-pack":
+            operation = str(value)
+            if operation == "load":
+                path = str(command.get("path", ""))
+                dialogues = load_dialogue_pack(path)
+                self.dialogue_deck = DialogueDeck(dialogues)
+                self.config.dialogue_pack = str(Path(path).expanduser().resolve())
+            elif operation == "clear":
+                self.dialogue_deck = DialogueDeck()
+                self.config.dialogue_pack = None
+            elif operation != "status":
+                raise ValueError(f"unknown dialogue-pack operation: {operation}")
+        elif action == "treat":
+            self.config.treats += 1
+            self.record_interaction(8)
+            self.start_temporary_animation("wave", 3600, "treat")
+        elif action == "mood":
+            pass
         elif action == "anchor":
             if value == "current":
                 self.config.anchor = "current"
@@ -649,7 +848,9 @@ class PetWindow(QWidget):
                     "open": "working",
                 }[str(value)]
         elif action == "play":
-            self.config.mode = "normal"
+            self.config.pomodoro_enabled = False
+            self.pomodoro_timer.stop()
+            self.set_mode("normal", speak=False)
             self.config.animation = str(value)
             self.look_override = None
             self.frame = 0
@@ -719,6 +920,17 @@ class PetWindow(QWidget):
                 "dialogue_accepts_focus": not bool(
                     self.bubble.windowFlags() & Qt.WindowType.WindowDoesNotAcceptFocus
                 ),
+                "pomodoro": {
+                    "enabled": self.config.pomodoro_enabled,
+                    "phase": self.config.pomodoro_phase,
+                    "remaining_seconds": max(0, self.pomodoro_timer.remainingTime()) // 1000,
+                },
+                "rubber_duck_enabled": self.config.rubber_duck_enabled,
+                "quiet_hours_active": self.quiet_hours_active(),
+                "dialogue_pack": self.config.dialogue_pack,
+                "mood": self.config.mood,
+                "treats": self.config.treats,
+                "interaction_streak": self.config.interaction_streak,
                 "context_menu_open_count": self.context_menu_open_count,
             },
         }
@@ -883,7 +1095,21 @@ class PetApplication(QApplication):
             )
             personality_menu.addAction(item)
 
+        productivity_menu = menu.addMenu("Productivity")
+        for label, action, value in [
+            ("Start Pomodoro", "pomodoro", "start"),
+            ("Stop Pomodoro", "pomodoro", "stop"),
+            ("Ask Rubber Duck", "rubber-duck", "ask"),
+            ("Rubber Duck prompts on", "rubber-duck", "on"),
+            ("Rubber Duck prompts off", "rubber-duck", "off"),
+            ("Celebrate victory", "victory", None),
+            ("Quiet mode on", "quiet-hours", "on"),
+            ("Quiet mode off", "quiet-hours", "off"),
+        ]:
+            add_action(productivity_menu, label, action, value)
+
         menu.addSeparator()
+        add_action(menu, "Give Leo a treat", "treat")
         add_action(menu, "Tell me something", "say", "I’m Leo. I turn coffee into code.")
         add_action(menu, "Give advice now", "advice-now")
         add_action(menu, "Anchor bottom-right", "anchor", "bottom-right")

@@ -25,6 +25,8 @@ def make_window(monkeypatch: object, config: PetConfig | None = None) -> runtime
     window.movement_timer.stop()
     window.dialogue_timer.stop()
     window.advice_timer.stop()
+    window.pomodoro_timer.stop()
+    window.rubber_duck_timer.stop()
     return window
 
 
@@ -126,4 +128,57 @@ def test_right_click_opens_shared_menu(monkeypatch: object) -> None:
     window.mousePressEvent(press)
     assert menu.popup_position == QPoint(66, 77)
     assert window.context_menu_open_count == 2
+    window.close()
+
+
+def test_pomodoro_cycles_focus_and_relax(monkeypatch: object) -> None:
+    window = make_window(monkeypatch)
+    window.handle(
+        {
+            "action": "pomodoro",
+            "value": "start",
+            "focus": 0.05,
+            "break_minutes": 0.05,
+        }
+    )
+    assert window.config.pomodoro_enabled
+    assert window.config.mode == "focus"
+    assert window.pomodoro_timer.isActive()
+    window.advance_pomodoro()
+    assert window.config.pomodoro_phase == "break"
+    assert window.config.mode == "relax"
+    window.handle({"action": "pomodoro", "value": "stop"})
+    assert not window.config.pomodoro_enabled
+    assert window.config.mode == "normal"
+    window.close()
+
+
+def test_quiet_hours_suppress_dialogue(monkeypatch: object) -> None:
+    window = make_window(monkeypatch)
+    window.handle({"action": "quiet-hours", "value": "on"})
+    assert window.quiet_hours_active()
+    assert not window.speak("idle", force=True)
+    window.handle({"action": "quiet-hours", "value": "off"})
+    assert not window.quiet_hours_active()
+    window.close()
+
+
+def test_treat_updates_mood_and_interaction_streak(monkeypatch: object) -> None:
+    window = make_window(monkeypatch)
+    before = window.config.mood
+    window.handle({"action": "treat"})
+    assert window.config.treats == 1
+    assert window.config.mood == min(100, before + 8)
+    assert window.config.interaction_streak == 1
+    assert window.temporary_animation == "wave"
+    window.close()
+
+
+def test_rubber_duck_and_victory_use_temporary_animations(monkeypatch: object) -> None:
+    window = make_window(monkeypatch)
+    window.handle({"action": "rubber-duck", "value": "ask"})
+    assert window.temporary_animation == "review"
+    window.finish_temporary_animation(window.temporary_generation)
+    window.handle({"action": "victory"})
+    assert window.temporary_animation == "jump"
     window.close()

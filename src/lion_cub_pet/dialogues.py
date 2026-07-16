@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import json
 import random
 from collections.abc import Mapping, Sequence
+from pathlib import Path
 
 DIALOGUES: dict[str, tuple[str, ...]] = {
     "idle": (
@@ -78,7 +80,72 @@ DIALOGUES: dict[str, tuple[str, ...]] = {
         "Look away from the screen for 20 seconds.",
         "Stretch your paws—uh, hands.",
     ),
+    "pomodoro_focus": (
+        "Focus sprint. Let’s ship something good.",
+        "Deep work mode: activated.",
+        "One task. Zero squirrels.",
+        "Timer started. I brought the headband.",
+    ),
+    "pomodoro_break": (
+        "Break time. Your brain earned snacks.",
+        "Step away before the code starts talking back.",
+        "Five minutes of professional lounging.",
+        "Save file. Stretch human.",
+    ),
+    "rubber_duck": (
+        "What did you expect this value to be?",
+        "What changed immediately before it broke?",
+        "Can you reproduce it with one smaller input?",
+        "Which assumption have we not verified?",
+        "What would the simplest failing test look like?",
+        "Is the state wrong, or only the rendering of it?",
+    ),
+    "victory": (
+        "Tests green. Mane magnificent.",
+        "That deserves a tiny roar!",
+        "Bug defeated. Snacks pending.",
+        "Commit it before reality changes its mind.",
+    ),
+    "treat": (
+        "Excellent. I accept this compensation.",
+        "Treat received. Morale restored.",
+        "You may continue coding now.",
+        "Crunch-driven development works.",
+    ),
 }
+
+MAX_DIALOGUE_PACK_BYTES = 256 * 1024
+MAX_LINES_PER_CATEGORY = 100
+MAX_LINE_LENGTH = 220
+
+
+def load_dialogue_pack(path: str | Path | None) -> dict[str, tuple[str, ...]]:
+    merged = dict(DIALOGUES)
+    if path is None:
+        return merged
+    pack_path = Path(path).expanduser().resolve()
+    if not pack_path.is_file():
+        raise ValueError(f"dialogue pack does not exist: {pack_path}")
+    if pack_path.stat().st_size > MAX_DIALOGUE_PACK_BYTES:
+        raise ValueError("dialogue pack exceeds 256 KiB")
+    raw = json.loads(pack_path.read_text(encoding="utf-8"))
+    if not isinstance(raw, dict):
+        raise ValueError("dialogue pack must be a JSON object")
+    for category, lines in raw.items():
+        if category not in DIALOGUES:
+            raise ValueError(f"unknown dialogue category: {category}")
+        if not isinstance(lines, list) or not 1 <= len(lines) <= MAX_LINES_PER_CATEGORY:
+            raise ValueError(f"{category} must contain 1-{MAX_LINES_PER_CATEGORY} lines")
+        normalized: list[str] = []
+        for line in lines:
+            if not isinstance(line, str) or not line.strip():
+                raise ValueError(f"{category} contains an invalid line")
+            text = line.strip()
+            if len(text) > MAX_LINE_LENGTH:
+                raise ValueError(f"{category} contains a line longer than {MAX_LINE_LENGTH} chars")
+            normalized.append(text)
+        merged[category] = (*DIALOGUES[category], *normalized)
+    return merged
 
 
 class DialogueDeck:

@@ -56,6 +56,15 @@ Stationary seated states render at 85% of the selected movement size so the cub 
 
 Leo uses shuffled dialogue bags, so a line does not repeat until the current state’s alternatives have been used. Advice appears at a low random frequency and temporarily uses a smooth 8-frame water-offering animation at 280 ms/frame.
 
+### Productivity and interaction systems
+
+- `Pomodoro` alternates configurable Focus and Relax phases; the default cycle is 25/5 minutes.
+- `Rubber Duck` asks a debugging question immediately or at a low random frequency every 10–20 minutes.
+- `Victory` plays a jump-to-wave celebration with a shuffled success line.
+- `Quiet Hours` supports immediate meeting silence and an optional daily `HH:MM` schedule, including overnight ranges.
+- `Treats` raise Leo's persisted 0–100 mood. Interacting on consecutive calendar days builds a persisted streak.
+- `Dialogue packs` merge validated local JSON lines into Leo's built-in shuffled categories.
+
 Laptop state is part of the animation contract:
 
 - Closed while walking, running, jumping, or waving.
@@ -143,11 +152,13 @@ lion-cub-pet speed <pixels-per-second>
 ### Appearance
 
 ```bash
+lion-cub-pet size tiny
 lion-cub-pet size small
 lion-cub-pet size normal
 lion-cub-pet size large
-lion-cub-pet size <scale>  # clamped to 0.70-1.25
+lion-cub-pet size <scale>  # clamped to 0.55-1.25
 lion-cub-pet opacity <0.25-1.0>
+lion-cub-pet transparency <0-75>
 lion-cub-pet always-on-top on|off
 lion-cub-pet click-through on|off
 ```
@@ -161,6 +172,17 @@ lion-cub-pet dialogues on|off
 lion-cub-pet advice on|off
 lion-cub-pet advice-now
 lion-cub-pet say <text>
+lion-cub-pet pomodoro start [--focus <minutes>] [--break <minutes>]
+lion-cub-pet pomodoro stop|status
+lion-cub-pet rubber-duck on|off|ask|status
+lion-cub-pet victory
+lion-cub-pet quiet-hours on|off|status
+lion-cub-pet quiet-hours schedule <HH:MM> <HH:MM>
+lion-cub-pet quiet-hours unschedule
+lion-cub-pet dialogue-pack load <path.json>
+lion-cub-pet dialogue-pack clear|status
+lion-cub-pet treat
+lion-cub-pet mood
 lion-cub-pet bounds work-area|full-screen
 lion-cub-pet idle-delay <seconds>
 lion-cub-pet run-chance <0-100>
@@ -185,6 +207,20 @@ lion-cub-pet laptop auto|closed|half-open|open
 lion-cub-pet demo
 lion-cub-pet preview <animation>
 ```
+
+### Custom dialogue-pack format
+
+Dialogue packs are UTF-8 JSON objects. Keys must match a built-in category and each value must contain 1–100 non-empty strings. Custom lines are merged with defaults and still use non-repeating shuffled bags.
+
+```json
+{
+  "working": ["Recompiling my confidence."],
+  "rubber_duck": ["Which boundary condition have we skipped?"],
+  "victory": ["Green build. Golden mane."]
+}
+```
+
+Supported categories are `idle`, `working`, `waiting`, `review`, `failure`, `departing`, `clicked`, `relax`, `focus`, `sleep`, `motivate`, `advice`, `pomodoro_focus`, `pomodoro_break`, `rubber_duck`, `victory`, and `treat`.
 
 `play`, `look`, `laptop`, `demo`, and `preview` are explicit overrides intended for testing and demonstrations. `lion-cub-pet play auto` returns control to the state machine.
 
@@ -231,7 +267,9 @@ The same menu is available from the system tray and by right-clicking Leo:
 - Roam, stay, or anchor bottom-right.
 - Pause or resume.
 - Select normal, relax, focus, sleep, or motivate mode.
-- Select a constrained small, normal, or large size.
+- Select a constrained tiny, small, normal, or large size and transparency preset.
+- Start/stop Pomodoro, ask the Rubber Duck, celebrate, or enable Quiet mode.
+- Give Leo a treat.
 - Request an advice animation or sample dialogue.
 - Quit.
 

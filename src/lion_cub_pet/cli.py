@@ -113,6 +113,9 @@ def parser() -> argparse.ArgumentParser:
         "unanchor",
         "demo",
         "advice-now",
+        "victory",
+        "treat",
+        "mood",
         "doctor",
         "paths",
         "check-update",
@@ -138,6 +141,21 @@ def parser() -> argparse.ArgumentParser:
         add_value_command(commands, name, ["on", "off"])
     add_value_command(commands, "personality", ["playful"])
     add_value_command(commands, "mode", ["normal", "relax", "focus", "sleep", "motivate"])
+    pomodoro = commands.add_parser("pomodoro")
+    pomodoro.add_argument("operation", choices=["start", "stop", "status"])
+    pomodoro.add_argument("--focus", type=float)
+    pomodoro.add_argument("--break", dest="break_minutes", type=float)
+    rubber_duck = commands.add_parser("rubber-duck")
+    rubber_duck.add_argument("operation", choices=["on", "off", "ask", "status"])
+    quiet_hours = commands.add_parser("quiet-hours")
+    quiet_hours.add_argument(
+        "operation", choices=["on", "off", "schedule", "unschedule", "status"]
+    )
+    quiet_hours.add_argument("start", nargs="?")
+    quiet_hours.add_argument("end", nargs="?")
+    dialogue_pack = commands.add_parser("dialogue-pack")
+    dialogue_pack.add_argument("operation", choices=["load", "clear", "status"])
+    dialogue_pack.add_argument("path", nargs="?")
     add_value_command(commands, "bounds", ["work-area", "full-screen"])
     for name in ["idle-delay", "run-chance", "snap-distance"]:
         add_value_command(commands, name)
@@ -230,6 +248,13 @@ def completion(shell: str) -> str:
         "mode",
         "say",
         "advice-now",
+        "pomodoro",
+        "rubber-duck",
+        "victory",
+        "quiet-hours",
+        "dialogue-pack",
+        "treat",
+        "mood",
         "anchor",
         "unanchor",
         "move",
@@ -320,12 +345,37 @@ def run(args: argparse.Namespace) -> Any:  # noqa: C901, PLR0911
         "unanchor",
         "demo",
         "advice-now",
+        "victory",
+        "treat",
+        "mood",
     }:
         return request(command)
     if command == "mode":
         return request("mode", args.value)
     if command == "say":
         return request("say", " ".join(args.text))
+    if command == "pomodoro":
+        return request(
+            "pomodoro",
+            args.operation,
+            focus=args.focus,
+            break_minutes=args.break_minutes,
+        )
+    if command == "rubber-duck":
+        return request("rubber-duck", args.operation)
+    if command == "quiet-hours":
+        if args.operation == "schedule" and (args.start is None or args.end is None):
+            raise ValueError("quiet-hours schedule requires START END in HH:MM format")
+        return request(
+            "quiet-hours",
+            args.operation,
+            start=args.start,
+            end=args.end,
+        )
+    if command == "dialogue-pack":
+        if args.operation == "load" and args.path is None:
+            raise ValueError("dialogue-pack load requires a JSON path")
+        return request("dialogue-pack", args.operation, path=args.path)
     if command == "anchor":
         return request("anchor", args.position)
     if command == "move":
