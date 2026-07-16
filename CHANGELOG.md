@@ -22,4 +22,5 @@ All notable changes will be recorded here. The project follows Semantic Versioni
 - Rebuilt Waiting, Review, and Focus so every open-laptop state uses the same readable exterior lid construction.
 - Added a non-destructive full animation showcase plus tray, corner, focus, and multi-monitor regression coverage.
 - Added Windows/Linux package smoke tests, terminal installers, release checksums, and PyPI Trusted Publishing automation.
+- Licensed software under MIT and original visual assets under CC BY 4.0, with both notices embedded in package archives.
 - Fixed immediate corner anchoring so geometry switches from the roaming gait to the stationary frame before edge alignment.

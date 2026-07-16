@@ -2,11 +2,12 @@
 
 ## One-time setup
 
-1. Choose explicit licenses for the source code and original artwork. Publishing remains blocked until both redistribution decisions are documented.
-2. Create the public GitHub repository and replace every `<OWNER>` placeholder in `README.md`.
-3. Create a protected GitHub environment named `pypi`; require an approver for production releases.
-4. In PyPI, create a pending Trusted Publisher for package `lion-cub-pet` using the GitHub owner, repository name, workflow `release.yml`, and environment `pypi`.
-5. Confirm the repository version, release tag, and changelog all match.
+Software is licensed under MIT and original visual assets under CC BY 4.0. Both notices are included in release archives through PEP 639 package metadata.
+
+1. Create the public GitHub repository and replace every `<OWNER>` placeholder in `README.md`.
+2. Create a protected GitHub environment named `pypi`; require an approver for production releases.
+3. In PyPI, create a pending Trusted Publisher for package `lion-cub-pet` using the GitHub owner, repository name, workflow `release.yml`, and environment `pypi`.
+4. Confirm the repository version, release tag, and changelog all match.
 
 `lion-cub-pet` returned no project from PyPI's JSON API during preparation on 2026-07-16. That is not a reservation; verify the name again immediately before creating the pending publisher.
 

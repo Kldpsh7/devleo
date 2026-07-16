@@ -437,10 +437,10 @@ The complete acceptance criteria are in [Graphics quality](docs/GRAPHICS_QUALITY
 
 ## Licensing
 
-No license has been selected yet. Before public distribution, choose licenses separately for:
+The project uses separate licenses for software and original visual assets:
 
-- Source code.
-- Original lion cub artwork and animation assets.
-- Third-party libraries, fonts, and bundled resources.
+- Source code, documentation, configuration, and non-visual project files are licensed under the [MIT License](LICENSE).
+- Original lion cub PNG, WebP, and GIF artwork under `assets/` and `src/lion_cub_pet/assets/` is licensed under [CC BY 4.0](LICENSE-ASSETS.md).
+- Third-party dependencies retain their own licenses.
 
-Do not assume the code license automatically grants redistribution rights for the artwork.
+Redistributions and artwork adaptations must preserve the applicable notices. Modified artwork must be identified as changed.

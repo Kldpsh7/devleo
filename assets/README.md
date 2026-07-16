@@ -14,3 +14,7 @@ assets/
 Large disposable generation intermediates should stay under ignored `assets/work/` or `assets/generated/` paths. Do not commit secrets, temporary prompts containing private context, or unreviewed generated variants.
 
 See [Graphics Quality](../docs/GRAPHICS_QUALITY.md).
+
+Original PNG, WebP, and GIF artwork in this workspace is licensed under
+[CC BY 4.0](../LICENSE-ASSETS.md). Non-visual project files remain under the
+[MIT License](../LICENSE).
