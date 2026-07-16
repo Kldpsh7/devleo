@@ -25,6 +25,7 @@ def test_all_documented_command_groups_parse() -> None:
         ["autostart", "status"],
         ["config", "set", "run_chance", "50"],
         ["event", "waiting", "--source", "test", "--ttl", "10"],
+        ["showcase", "--seconds-per-state", "0.5"],
     ]
     for argv in cases:
         assert parser().parse_args(argv).command == argv[0]

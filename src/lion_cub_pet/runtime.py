@@ -22,6 +22,7 @@ from PySide6.QtGui import (
     QMoveEvent,
     QPixmap,
     QResizeEvent,
+    QScreen,
 )
 from PySide6.QtNetwork import QLocalServer, QLocalSocket
 from PySide6.QtWidgets import QApplication, QLabel, QMenu, QSystemTrayIcon, QWidget
@@ -85,6 +86,27 @@ STATIONARY_ANIMATIONS = {
     "advice",
 }
 ROAMING_ANIMATIONS = {"walk", "walk-right", "walk-left"}
+SHOWCASE_STEPS = (
+    ("Idle", "animation", "idle"),
+    ("Walk right", "animation", "walk-right"),
+    ("Walk left", "animation", "walk-left"),
+    ("Wave", "animation", "wave"),
+    ("Jump", "animation", "jump"),
+    ("Failure", "animation", "failure"),
+    ("Waiting", "animation", "waiting"),
+    ("Working", "animation", "working"),
+    ("Active work", "animation", "run"),
+    ("Review", "animation", "review"),
+    ("Relax", "animation", "relax"),
+    ("Focus", "animation", "focus"),
+    ("Sleep", "animation", "sleep"),
+    ("Motivate", "animation", "motivate"),
+    ("Advice", "animation", "advice"),
+    ("Gaze up", "look", "0"),
+    ("Gaze right", "look", "90"),
+    ("Gaze down", "look", "180"),
+    ("Gaze left", "look", "270"),
+)
 ANIMATION_ROWS = {
     "idle": 0,
     "walk": 1,
@@ -102,6 +124,10 @@ ANIMATION_ROWS = {
 
 def asset_path(name: str) -> Path:
     return Path(str(files("lion_cub_pet.assets").joinpath(name)))
+
+
+def application_screens() -> list[QScreen]:
+    return QGuiApplication.screens()
 
 
 class PetWindow(QWidget):
@@ -137,6 +163,9 @@ class PetWindow(QWidget):
         self.temporary_animation: str | None = None
         self.temporary_generation = 0
         self.mode_generation = 0
+        self.showcase_generation = 0
+        self.showcase_animation: str | None = None
+        self.showcase_step_label: str | None = None
         flags = Qt.WindowType.FramelessWindowHint | Qt.WindowType.Tool
         if config.always_on_top:
             flags |= Qt.WindowType.WindowStaysOnTopHint
@@ -255,7 +284,7 @@ class PetWindow(QWidget):
         )
 
     def work_area(self) -> QRect:
-        screens = QGuiApplication.screens()
+        screens = application_screens()
         index = min(max(self.config.screen, 0), len(screens) - 1)
         screen = screens[index]
         return (
@@ -372,6 +401,8 @@ class PetWindow(QWidget):
         save_config(self.config)
 
     def current_animation(self) -> str:
+        if self.showcase_animation is not None:
+            return self.showcase_animation
         if self.temporary_animation is not None:
             return self.temporary_animation
         if self.config.mode != "normal":
@@ -654,6 +685,7 @@ class PetWindow(QWidget):
             or self.config.movement != "roam"
             or self.config.mode != "normal"
             or self.temporary_animation is not None
+            or self.showcase_animation is not None
             or self.look_override is not None
             or (
                 self.config.animation != "auto"
@@ -682,6 +714,64 @@ class PetWindow(QWidget):
                 )
             )
         )
+
+    def start_showcase(self, seconds_per_state: float) -> None:
+        interval_ms = round(min(max(seconds_per_state, 0.5), 10.0) * 1000)
+        self.showcase_generation += 1
+        generation = self.showcase_generation
+        self.target = None
+        self.apply_showcase_step(generation, SHOWCASE_STEPS[0])
+        for index, step in enumerate(SHOWCASE_STEPS[1:], start=1):
+            QTimer.singleShot(
+                index * interval_ms,
+                lambda item=step, token=generation: self.apply_showcase_step(token, item),
+            )
+        QTimer.singleShot(
+            len(SHOWCASE_STEPS) * interval_ms,
+            lambda token=generation: self.finish_showcase(token),
+        )
+
+    def apply_showcase_step(
+        self,
+        generation: int,
+        step: tuple[str, str, str],
+    ) -> None:
+        if generation != self.showcase_generation:
+            return
+        label, kind, value = step
+        self.showcase_step_label = label
+        if kind == "look":
+            degree = float(value) % 360
+            self.showcase_animation = None
+            self.row = 9 if degree < 180 else 10
+            self.frame = round((degree % 180) / 22.5) % 8
+            self.look_override = (self.row, self.frame)
+            self.active_animation = f"look-{self.row}"
+        else:
+            self.look_override = None
+            self.showcase_animation = value
+            self.active_animation = value
+            self.frame = 0
+            self.row = ANIMATION_ROWS.get(CUSTOM_FALLBACKS.get(value, value), -1)
+        self.animation_timer.setInterval(self.animation_interval(self.active_animation))
+        self.render_frame()
+
+    def finish_showcase(self, generation: int) -> None:
+        if generation != self.showcase_generation:
+            return
+        self.showcase_generation += 1
+        self.showcase_animation = None
+        self.showcase_step_label = None
+        self.look_override = None
+        self.active_animation = self.current_animation()
+        self.animation_timer.setInterval(self.animation_interval(self.active_animation))
+        self.frame = 0
+        self.render_frame()
+
+    def cancel_showcase(self) -> None:
+        if self.showcase_animation is None and self.showcase_step_label is None:
+            return
+        self.finish_showcase(self.showcase_generation)
 
     def mousePressEvent(self, event: QMouseEvent) -> None:  # noqa: N802
         if event.button() == Qt.MouseButton.RightButton and self.context_menu is not None:
@@ -731,6 +821,8 @@ class PetWindow(QWidget):
     def handle(self, command: dict[str, Any]) -> dict[str, Any]:
         action = str(command.get("action", "status"))
         value = command.get("value")
+        if action not in {"status", "showcase", "demo"}:
+            self.cancel_showcase()
         if action == "show":
             self.config.visible = True
             self.show()
@@ -858,7 +950,7 @@ class PetWindow(QWidget):
         elif action == "screen":
             if value is None:
                 raise ValueError("screen requires an index or next")
-            screens = QGuiApplication.screens()
+            screens = application_screens()
             self.config.screen = (
                 (self.config.screen + 1) % len(screens) if value == "next" else int(value)
             )
@@ -917,13 +1009,9 @@ class PetWindow(QWidget):
             self.active_animation = f"look-{self.row}"
             self.render_frame()
         elif action == "demo":
-            self.look_override = None
-            sequence = ["idle", "wave", "jump", "waiting", "working", "review", "failure", "auto"]
-            for index, animation in enumerate(sequence):
-                QTimer.singleShot(
-                    index * 1800,
-                    lambda name=animation: self.handle({"action": "play", "value": name}),
-                )
+            self.start_showcase(1.8)
+        elif action == "showcase":
+            self.start_showcase(float(command.get("seconds_per_state", 1.2)))
         elif action == "quit":
             QTimer.singleShot(0, QApplication.quit)
         self.persist_position()
@@ -947,7 +1035,7 @@ class PetWindow(QWidget):
                 ],
                 "screen_bounds": [area.x(), area.y(), area.width(), area.height()],
                 "native_window": self.native_window_state,
-                "animation": self.current_animation(),
+                "animation": self.active_animation,
                 "row": self.row,
                 "frame": self.frame,
                 "frame_interval_ms": self.animation_timer.interval(),
@@ -980,6 +1068,11 @@ class PetWindow(QWidget):
                 "treats": self.config.treats,
                 "interaction_streak": self.config.interaction_streak,
                 "context_menu_open_count": self.context_menu_open_count,
+                "showcase": {
+                    "active": self.showcase_step_label is not None,
+                    "step": self.showcase_step_label,
+                    "states": [label for label, _kind, _value in SHOWCASE_STEPS],
+                },
             },
         }
 

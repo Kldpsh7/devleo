@@ -122,6 +122,8 @@ def parser() -> argparse.ArgumentParser:
         "update",
     ]:
         commands.add_parser(name)
+    showcase = commands.add_parser("showcase")
+    showcase.add_argument("--seconds-per-state", type=float, default=1.2)
     anchor = commands.add_parser("anchor")
     anchor.add_argument(
         "position", choices=["current", "bottom-right", "bottom-left", "top-right", "top-left"]
@@ -277,6 +279,7 @@ def completion(shell: str) -> str:
         "look",
         "laptop",
         "demo",
+        "showcase",
         "preview",
         "autostart",
         "config",
@@ -350,6 +353,8 @@ def run(args: argparse.Namespace) -> Any:  # noqa: C901, PLR0911
         "mood",
     }:
         return request(command)
+    if command == "showcase":
+        return request("showcase", seconds_per_state=args.seconds_per_state)
     if command == "mode":
         return request("mode", args.value)
     if command == "say":

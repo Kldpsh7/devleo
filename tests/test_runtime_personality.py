@@ -1,6 +1,6 @@
-from PySide6.QtCore import QEvent, QPoint, QPointF, Qt
+from PySide6.QtCore import QEvent, QObject, QPoint, QPointF, QRect, Qt
 from PySide6.QtGui import QContextMenuEvent, QMouseEvent
-from PySide6.QtWidgets import QApplication, QMenu
+from PySide6.QtWidgets import QApplication, QMenu, QSystemTrayIcon
 
 import lion_cub_pet.runtime as runtime
 from lion_cub_pet.bubble import ThoughtBubble
@@ -15,6 +15,25 @@ class RecordingMenu(QMenu):
     def popup(self, pos: QPoint, action: object = None) -> None:  # type: ignore[override]
         del action
         self.popup_position = pos
+
+
+class FakeScreen:
+    def __init__(self, geometry: QRect, available: QRect | None = None) -> None:
+        self._geometry = geometry
+        self._available = available or geometry
+
+    def geometry(self) -> QRect:
+        return self._geometry
+
+    def availableGeometry(self) -> QRect:  # noqa: N802
+        return self._available
+
+
+class MenuOwner(QObject):
+    def __init__(self, window: runtime.PetWindow) -> None:
+        super().__init__()
+        self.window = window
+        self.menu: QMenu | None = None
 
 
 def make_window(monkeypatch: object, config: PetConfig | None = None) -> runtime.PetWindow:
@@ -92,6 +111,42 @@ def test_roam_clears_manual_stationary_animation(monkeypatch: object) -> None:
     assert window.config.movement == "roam"
     assert window.config.animation == "auto"
     assert window.config.mode == "normal"
+    window.close()
+
+
+def test_showcase_covers_all_runtime_modes_without_changing_config(monkeypatch: object) -> None:
+    window = make_window(monkeypatch, PetConfig(movement="roam", animation="auto"))
+    before = (window.config.movement, window.config.animation, window.config.mode)
+    window.start_showcase(0.5)
+    generation = window.showcase_generation
+    labels = [label for label, _kind, _value in runtime.SHOWCASE_STEPS]
+    assert labels == [
+        "Idle",
+        "Walk right",
+        "Walk left",
+        "Wave",
+        "Jump",
+        "Failure",
+        "Waiting",
+        "Working",
+        "Active work",
+        "Review",
+        "Relax",
+        "Focus",
+        "Sleep",
+        "Motivate",
+        "Advice",
+        "Gaze up",
+        "Gaze right",
+        "Gaze down",
+        "Gaze left",
+    ]
+    window.apply_showcase_step(generation, runtime.SHOWCASE_STEPS[7])
+    assert window.current_animation() == "working"
+    assert (window.config.movement, window.config.animation, window.config.mode) == before
+    window.finish_showcase(generation)
+    assert window.current_animation() == "idle"
+    assert window.showcase_step_label is None
     window.close()
 
 
@@ -177,6 +232,44 @@ def test_right_click_opens_shared_menu(monkeypatch: object) -> None:
     window.mousePressEvent(press)
     assert menu.popup_position == QPoint(66, 77)
     assert window.context_menu_open_count == 2
+    window.close()
+
+
+def test_tray_and_right_click_share_complete_menu(monkeypatch: object) -> None:
+    window = make_window(monkeypatch)
+    owner = MenuOwner(window)
+    menu = runtime.PetApplication.create_menu(owner)  # type: ignore[arg-type]
+    owner.menu = menu
+    window.context_menu = menu
+    monkeypatch.setattr(QSystemTrayIcon, "show", lambda _tray: None)
+    tray = runtime.PetApplication.create_tray(owner)  # type: ignore[arg-type]
+    assert tray.contextMenu() is menu
+    labels = {action.text() for action in menu.actions()}
+    assert {"Roam", "Stay", "Mode", "Size", "Transparency", "Productivity"} <= labels
+    assert window.context_menu is tray.contextMenu()
+    tray.hide()
+    tray.deleteLater()
+    window.close()
+
+
+def test_screen_switch_and_corner_anchor_use_selected_monitor(monkeypatch: object) -> None:
+    screens = [
+        FakeScreen(QRect(0, 0, 800, 600)),
+        FakeScreen(QRect(800, -100, 1000, 700), QRect(800, -80, 1000, 660)),
+    ]
+    monkeypatch.setattr(runtime, "application_screens", lambda: screens)
+    window = make_window(
+        monkeypatch,
+        PetConfig(screen=1, bounds="full-screen", movement="stay"),
+    )
+    assert window.work_area() == QRect(800, -100, 1000, 700)
+    window.apply_anchor("bottom-right")
+    visible = window.scaled_content_rect().translated(window.pos())
+    assert visible.right() == 1799
+    assert visible.bottom() == 599
+    window.handle({"action": "screen", "value": "next"})
+    assert window.config.screen == 0
+    assert window.work_area() == QRect(0, 0, 800, 600)
     window.close()
 
 
