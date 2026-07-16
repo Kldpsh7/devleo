@@ -1,0 +1,32 @@
+{
+  "displayName": "Leo the Dev",
+  "cell": {
+    "width": 192,
+    "height": 208
+  },
+  "chromaKey": "#00FFFF",
+  "modes": {
+    "relax": {
+      "frames": 6,
+      "visual": "sunglasses, fizzy cola, lounging loop"
+    },
+    "focus": {
+      "frames": 6,
+      "visual": "red training headband, folded sitting pose, intense laptop work"
+    },
+    "sleep": {
+      "frames": 6,
+      "visual": "curled breathing loop with requested cartoon Z cue"
+    },
+    "motivate": {
+      "frames": 4,
+      "visual": "encouraging paw gestures"
+    },
+    "advice": {
+      "frames": 6,
+      "visual": "continuous same-paw water offering loop"
+    }
+  },
+  "deterministicInspection": "pass",
+  "visualQa": "pass"
+}
