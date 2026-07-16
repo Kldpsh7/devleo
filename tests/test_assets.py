@@ -21,7 +21,7 @@ def test_left_gait_is_framewise_mirror_without_reordering() -> None:
 
 
 def test_custom_mode_frames_have_runtime_geometry() -> None:
-    counts = {"relax": 6, "focus": 6, "sleep": 6, "motivate": 4, "advice": 6}
+    counts = {"relax": 8, "focus": 8, "sleep": 8, "motivate": 8, "advice": 8}
     root = files("lion_cub_pet.assets")
     for mode, count in counts.items():
         for frame in range(count):

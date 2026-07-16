@@ -36,6 +36,26 @@ def test_stationary_art_is_fifteen_percent_smaller(monkeypatch: object) -> None:
     window.close()
 
 
+def test_custom_modes_use_slower_animation_intervals(monkeypatch: object) -> None:
+    window = make_window(monkeypatch)
+    for mode in ("relax", "focus", "sleep", "motivate", "advice"):
+        assert window.frame_count(mode) == 8
+        assert window.animation_interval(mode) > runtime.DEFAULT_FRAME_INTERVAL
+    window.close()
+
+
+def test_motivate_returns_to_normal_only_for_current_generation(monkeypatch: object) -> None:
+    window = make_window(monkeypatch)
+    window.handle({"action": "mode", "value": "motivate"})
+    generation = window.mode_generation
+    window.finish_motivate(generation - 1)
+    assert window.config.mode == "motivate"
+    window.finish_motivate(generation)
+    assert window.config.mode == "normal"
+    assert window.animation_timer.interval() == runtime.DEFAULT_FRAME_INTERVAL
+    window.close()
+
+
 def test_size_is_clamped_to_safe_range(monkeypatch: object) -> None:
     window = make_window(monkeypatch)
     window.handle({"action": "set", "key": "scale", "value": 8.0})

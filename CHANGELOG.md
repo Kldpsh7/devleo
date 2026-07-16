@@ -10,3 +10,5 @@ All notable changes will be recorded here. The project follows Semantic Versioni
 - Established the Leo the Dev lion cub identity and production animation QA pipeline.
 - Added right-click controls, shuffled comic-bubble dialogue, safe size limits, and 15% smaller stationary rendering.
 - Added relax, focus, sleep, motivate, and low-frequency advice animations.
+- Rebuilt all five custom modes as independently validated 8-frame loops with slower state-specific timing.
+- Motivate now returns to Normal after a randomized 5–8 seconds without overriding a later manual mode selection.

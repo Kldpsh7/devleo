@@ -37,7 +37,15 @@ MAX_SCALE = 1.25
 MIN_OPACITY = 0.25
 MAX_OPACITY = 1.0
 FRAME_COUNTS = {0: 6, 1: 8, 2: 8, 3: 4, 4: 5, 5: 8, 6: 6, 7: 6, 8: 6, 9: 8, 10: 8}
-CUSTOM_FRAME_COUNTS = {"relax": 6, "focus": 6, "sleep": 6, "motivate": 4, "advice": 6}
+CUSTOM_FRAME_COUNTS = {"relax": 8, "focus": 8, "sleep": 8, "motivate": 8, "advice": 8}
+FRAME_INTERVALS = {
+    "relax": 260,
+    "focus": 210,
+    "sleep": 360,
+    "motivate": 240,
+    "advice": 280,
+}
+DEFAULT_FRAME_INTERVAL = 135
 CUSTOM_FALLBACKS = {
     "relax": "idle",
     "focus": "working",
@@ -100,6 +108,7 @@ class PetWindow(QWidget):
         self.dialogue_deck = DialogueDeck()
         self.last_spoken_at = 0.0
         self.temporary_animation: str | None = None
+        self.mode_generation = 0
         flags = Qt.WindowType.FramelessWindowHint | Qt.WindowType.Tool
         if config.always_on_top:
             flags |= Qt.WindowType.WindowStaysOnTopHint
@@ -114,7 +123,7 @@ class PetWindow(QWidget):
         self.config.opacity = min(max(float(config.opacity), MIN_OPACITY), MAX_OPACITY)
         self.setWindowOpacity(self.config.opacity)
         self.restore_position()
-        self.animation_timer = QTimer(self, interval=110)
+        self.animation_timer = QTimer(self, interval=self.animation_interval("idle"))
         self.animation_timer.timeout.connect(self.advance_frame)
         self.animation_timer.start()
         self.movement_timer = QTimer(self, interval=16)
@@ -157,6 +166,9 @@ class PetWindow(QWidget):
         if animation in CUSTOM_FRAME_COUNTS:
             return CUSTOM_FRAME_COUNTS[animation]
         return FRAME_COUNTS[ANIMATION_ROWS.get(animation, 0)]
+
+    def animation_interval(self, animation: str | None = None) -> int:
+        return FRAME_INTERVALS.get(animation or self.active_animation, DEFAULT_FRAME_INTERVAL)
 
     def source_pixmap(self, animation: str, frame: int) -> QPixmap:
         if animation.startswith("look-"):
@@ -327,6 +339,7 @@ class PetWindow(QWidget):
         if animation != self.active_animation:
             self.active_animation = animation
             self.frame = 0
+            self.animation_timer.setInterval(self.animation_interval(animation))
             self.on_animation_changed(animation)
         else:
             self.frame = (self.frame + 1) % self.frame_count(animation)
@@ -404,6 +417,7 @@ class PetWindow(QWidget):
             self.look_override = None
             self.target = None
             self.active_animation = "advice"
+            self.animation_timer.setInterval(self.animation_interval("advice"))
             self.frame = 0
             self.render_frame()
             self.speak("advice", 6000, force=True)
@@ -414,6 +428,7 @@ class PetWindow(QWidget):
         if self.temporary_animation == "advice":
             self.temporary_animation = None
             self.active_animation = self.current_animation()
+            self.animation_timer.setInterval(self.animation_interval(self.active_animation))
             self.frame = 0
             self.render_frame()
 
@@ -554,14 +569,22 @@ class PetWindow(QWidget):
             if mode not in {"normal", *CUSTOM_FRAME_COUNTS} - {"advice"}:
                 raise ValueError(f"unknown mode: {mode}")
             self.config.mode = mode
+            self.mode_generation += 1
             self.temporary_animation = None
             self.look_override = None
             self.target = None
             self.active_animation = "idle" if mode == "normal" else mode
+            self.animation_timer.setInterval(self.animation_interval(self.active_animation))
             self.frame = 0
             self.render_frame()
             if mode != "normal":
                 self.speak(mode, force=True)
+            if mode == "motivate":
+                generation = self.mode_generation
+                QTimer.singleShot(
+                    round(random.uniform(5.0, 8.0) * 1000),
+                    lambda: self.finish_motivate(generation),
+                )
         elif action == "say":
             if not isinstance(value, str) or not value.strip():
                 raise ValueError("say requires text")
@@ -679,6 +702,7 @@ class PetWindow(QWidget):
                 "animation": self.current_animation(),
                 "row": self.row,
                 "frame": self.frame,
+                "frame_interval_ms": self.animation_timer.interval(),
                 "application_icon": {
                     "qt": not app.windowIcon().isNull(),
                     "native": bool(app.property("nativeApplicationIconApplied")),
@@ -698,6 +722,17 @@ class PetWindow(QWidget):
                 "context_menu_open_count": self.context_menu_open_count,
             },
         }
+
+    def finish_motivate(self, generation: int) -> None:
+        if self.config.mode != "motivate" or generation != self.mode_generation:
+            return
+        self.config.mode = "normal"
+        self.mode_generation += 1
+        self.active_animation = "idle"
+        self.animation_timer.setInterval(self.animation_interval("idle"))
+        self.frame = 0
+        self.render_frame()
+        self.persist_position()
 
     def apply_platform_window_policy(self) -> None:
         if sys.platform != "darwin":

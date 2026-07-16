@@ -49,12 +49,12 @@ Stationary seated states render at 85% of the selected movement size so the cub 
 | Mode | Visual behavior |
 |---|---|
 | Normal | Roaming, working, waiting, review, and failure state machine |
-| Relax | Sunglasses, fizzy cola, lounging motion |
-| Focus | Red training headband, folded sitting pose, intense laptop work |
-| Sleep | Curled sleeping pose, breathing, ear/tail motion, cartoon Z cue |
-| Motivate | Encouraging paw gestures and short motivational dialogue |
+| Relax | 8-frame sunglasses-and-cola lounge loop at 260 ms/frame |
+| Focus | 8-frame headband, folded sitting, and laptop loop at 210 ms/frame |
+| Sleep | 8-frame curled breathing loop at 360 ms/frame |
+| Motivate | 8-frame encouraging gesture at 240 ms/frame; returns to Normal after 5–8 seconds |
 
-Leo uses shuffled dialogue bags, so a line does not repeat until the current state’s alternatives have been used. Advice appears at a low random frequency and temporarily uses a water-offering animation.
+Leo uses shuffled dialogue bags, so a line does not repeat until the current state’s alternatives have been used. Advice appears at a low random frequency and temporarily uses a smooth 8-frame water-offering animation at 280 ms/frame.
 
 Laptop state is part of the animation contract:
 

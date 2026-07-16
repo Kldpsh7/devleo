@@ -7,26 +7,33 @@
   "chromaKey": "#00FFFF",
   "modes": {
     "relax": {
-      "frames": 6,
-      "visual": "sunglasses, fizzy cola, lounging loop"
+      "frames": 8,
+      "frameIntervalMs": 260,
+      "visual": "sunglasses, fizzy cola, slow lounging loop"
     },
     "focus": {
-      "frames": 6,
-      "visual": "red training headband, folded sitting pose, intense laptop work"
+      "frames": 8,
+      "frameIntervalMs": 210,
+      "visual": "red training headband, folded sitting pose, smooth laptop work"
     },
     "sleep": {
-      "frames": 6,
-      "visual": "curled breathing loop with requested cartoon Z cue"
+      "frames": 8,
+      "frameIntervalMs": 360,
+      "visual": "curled slow-breathing loop with requested cartoon Z cue"
     },
     "motivate": {
-      "frames": 4,
-      "visual": "encouraging paw gestures"
+      "frames": 8,
+      "frameIntervalMs": 240,
+      "durationSeconds": "5-8",
+      "visual": "encouraging paw gestures with automatic return to Normal"
     },
     "advice": {
-      "frames": 6,
+      "frames": 8,
+      "frameIntervalMs": 280,
       "visual": "continuous same-paw water offering loop"
     }
   },
   "deterministicInspection": "pass",
+  "edgeDespill": "pass",
   "visualQa": "pass"
 }
