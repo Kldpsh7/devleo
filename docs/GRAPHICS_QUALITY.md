@@ -43,6 +43,7 @@ The window movement rate is independent of sprite FPS. Increasing window update 
 ### Idle
 
 Subtle breathing, one natural blink, a small tail flick, and a brief curious glance. The feet and body base remain stable.
+The closed laptop sits in front of the cub with a broad viewer-facing exterior lid, readable rim, hinge seam, and paw emblem. It must not collapse into a thin edge or disappear beneath the paws at the minimum display scale.
 
 ### Walk and run
 
@@ -130,4 +131,3 @@ Each visual release retains:
 - Deterministic validation JSON.
 - Asset manifest with source and export checksums.
 - Final visual QA verdict and documented accepted warnings.
-

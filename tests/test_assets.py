@@ -39,3 +39,22 @@ def test_smooth_standard_overrides_have_runtime_geometry() -> None:
             size = reader.size()
             assert reader.canRead(), (state, frame)
             assert (size.width(), size.height()) == (192, 208), (state, frame)
+
+
+def test_idle_closed_laptop_lid_remains_readable() -> None:
+    root = files("lion_cub_pet.assets")
+    for frame in range(8):
+        image = QImage(str(root.joinpath(f"animations/idle/{frame:02}.png")))
+        neutral_lid_pixels = 0
+        for y in range(145, 208):
+            for x in range(192):
+                color = image.pixelColor(x, y)
+                channels = (color.red(), color.green(), color.blue())
+                average = sum(channels) // 3
+                if (
+                    color.alpha() >= 160
+                    and max(channels) - min(channels) <= 50
+                    and 45 <= average <= 225
+                ):
+                    neutral_lid_pixels += 1
+        assert neutral_lid_pixels >= 2400, (frame, neutral_lid_pixels)

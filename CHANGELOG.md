@@ -24,3 +24,4 @@ All notable changes will be recorded here. The project follows Semantic Versioni
 - Added Windows/Linux package smoke tests, terminal installers, release checksums, and PyPI Trusted Publishing automation.
 - Licensed software under MIT and original visual assets under CC BY 4.0, with both notices embedded in package archives.
 - Fixed immediate corner anchoring so geometry switches from the roaming gait to the stationary frame before edge alignment.
+- Rebuilt Idle so the closed laptop lid remains a broad, readable silver panel at the smallest display scale.

@@ -4,7 +4,11 @@
   "framesPerState": 8,
   "chromaKey": "#00FFFF",
   "batch1": {
-    "idle": {"frameIntervalMs": 230, "visualQa": "pass"},
+    "idle": {
+      "frameIntervalMs": 230,
+      "visualQa": "pass",
+      "closedLaptopLid": "broad viewer-facing silver panel with graphite rim, hinge seam, and centered paw emblem"
+    },
     "wave": {"frameIntervalMs": 180, "visualQa": "pass"},
     "jump": {"frameIntervalMs": 160, "visualQa": "pass"}
   },
@@ -13,6 +17,7 @@
     "working": {"frameIntervalMs": 180, "visualQa": "pass"},
     "review": {"frameIntervalMs": 220, "visualQa": "pass"}
   },
+  "closedLaptopInvariant": "closed exterior lid remains a filled viewer-facing surface at minimum display scale and never collapses into an edge-on line or disappears beneath Leo's paws",
   "openLaptopInvariant": "exterior lid faces viewer with graphite rim, hinge seam, and paw emblem; Leo sits behind the unseen screen",
   "deterministicInspection": "pass",
   "edgeDespill": "pass"
