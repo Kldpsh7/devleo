@@ -104,6 +104,17 @@ The full gaze command renders 16 clockwise directions from `000` up through
 1152x1248 transparent masters, a normal-size loop, and an isolated 1536x2288 QA
 atlas for the hatch-pet direction semantics, continuity, and blind-review gates.
 
+Render the quadrupedal locomotion family after gaze approval:
+
+```bash
+tools/blender/render_locomotion.sh
+```
+
+This produces 12-frame left/right Walk and playful pounce-Run candidates from the
+canonical source without modifying it. The closed laptop remains secured against
+Leo's flank while deterministic QA checks master alpha, registration, cadence, and
+the Run airborne phase.
+
 ## Approval gate
 
 This prototype is intentionally isolated from the live pet. Approval requires the
