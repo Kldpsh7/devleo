@@ -125,6 +125,18 @@ Wave raises a complete seated front-leg chain. Jump uses the quadrupedal carry p
 for a four-paw spring with an airborne phase. Both return exactly to their source
 pose and keep the laptop closed.
 
+Render seated-to-roaming transition candidates after locomotion approval:
+
+```bash
+tools/blender/render_transitions.sh
+```
+
+This produces 20-frame Idle-to-Walk and exact reversed Walk-to-Idle sequences for
+both directions. Leo crouches and lifts the closed laptop into or out of the
+approved flank carry so a roaming cycle does not snap between seated and moving
+poses. The transition wrapper registers each frame to the canonical master ground
+line before generating QA artifacts.
+
 ## Approval gate
 
 This prototype is intentionally isolated from the live pet. Approval requires the
