@@ -66,10 +66,22 @@ def dilate(mask: np.ndarray, iterations: int) -> np.ndarray:
     return result
 
 
+def erode(mask: np.ndarray, iterations: int) -> np.ndarray:
+    result = mask.copy()
+    for _ in range(iterations):
+        contracted = result.copy()
+        contracted[1:] &= result[:-1]
+        contracted[:-1] &= result[1:]
+        contracted[:, 1:] &= result[:, :-1]
+        contracted[:, :-1] &= result[:, 1:]
+        result = contracted
+    return result
+
+
 def extend_edge_colors(texture: Image.Image) -> Image.Image:
     """Fill projection-only transparent pixels from the nearest subject color."""
     rgba = np.asarray(texture.convert("RGBA"), dtype=np.uint8).copy()
-    known = rgba[:, :, 3] >= 220
+    known = erode(rgba[:, :, 3] >= 220, 6)
     if not np.any(known):
         raise RuntimeError("Cannot extend an empty turnaround texture")
     queue: deque[tuple[int, int]] = deque(

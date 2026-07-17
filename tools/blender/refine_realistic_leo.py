@@ -348,9 +348,9 @@ def apply_turnaround_projection(body: bpy.types.Object, textures_dir: Path) -> N
     set_input(dorsal_noise, "Roughness", 0.68)
     dorsal_ramp = nodes.new("ShaderNodeValToRGB")
     dorsal_ramp.color_ramp.elements[0].position = 0.20
-    dorsal_ramp.color_ramp.elements[0].color = rgba("#71310C")
+    dorsal_ramp.color_ramp.elements[0].color = rgba("#421706")
     dorsal_ramp.color_ramp.elements[1].position = 0.82
-    dorsal_ramp.color_ramp.elements[1].color = rgba("#D77E25")
+    dorsal_ramp.color_ramp.elements[1].color = rgba("#8C4716")
     links.new(coordinates.outputs["Generated"], dorsal_noise.inputs["Vector"])
     links.new(dorsal_noise.outputs["Fac"], dorsal_ramp.inputs["Fac"])
     links.new(dorsal_ramp.outputs["Color"], vertical_color.inputs[1])

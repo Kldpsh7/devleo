@@ -13,11 +13,13 @@ What passed:
 - mechanical alpha, framing, and safety-edge QA passes;
 - the front face, eyes, ear markings, coat, paws, and side anatomy derive from the
   approved project-owned realistic reference;
+- projection-only edge colors extend from interior fur, preventing a bright seam
+  along the spine, head, and tail;
 - multi-object normalization no longer detaches facial geometry.
 
 What remains before rigging:
 
-- reduce the remaining dorsal projection blend and improve the belly transition;
+- improve the remaining belly projection transition;
 - refine the head, ear, paw, and tail geometry against the turnaround;
 - produce a clean deformation topology and approve the final turntable at pet size.
 
