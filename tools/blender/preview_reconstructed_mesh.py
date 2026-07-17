@@ -28,6 +28,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--rotation-z", type=float, default=0.0)
     parser.add_argument("--smooth-factor", type=float, default=0.0)
     parser.add_argument("--smooth-iterations", type=int, default=0)
+    parser.add_argument("--preserve-materials", action="store_true")
     parser.add_argument("--samples", type=int, default=64)
     args = sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else []
     return parser.parse_args(args)
@@ -70,11 +71,8 @@ def look_at(object_: bpy.types.Object, target: Vector) -> None:
     object_.rotation_euler = direction.to_track_quat("-Z", "Y").to_euler()
 
 
-def add_vertex_color_material(object_: bpy.types.Object) -> None:
+def add_preview_material(object_: bpy.types.Object) -> None:
     mesh = object_.data
-    if not hasattr(mesh, "color_attributes") or not mesh.color_attributes:
-        return
-    color_attribute = mesh.color_attributes.active_color or mesh.color_attributes[0]
     material = bpy.data.materials.new(f"{object_.name} reconstructed color")
     material.use_nodes = True
     nodes = material.node_tree.nodes
@@ -82,13 +80,17 @@ def add_vertex_color_material(object_: bpy.types.Object) -> None:
     principled = nodes.get("Principled BSDF")
     if principled is None:
         raise RuntimeError("Principled BSDF missing")
-    color_node = nodes.new("ShaderNodeVertexColor")
-    color_node.layer_name = color_attribute.name
-    saturation = nodes.new("ShaderNodeHueSaturation")
-    saturation.inputs["Saturation"].default_value = 1.32
-    saturation.inputs["Value"].default_value = 0.78
-    links.new(color_node.outputs["Color"], saturation.inputs["Color"])
-    links.new(saturation.outputs["Color"], principled.inputs["Base Color"])
+    if hasattr(mesh, "color_attributes") and mesh.color_attributes:
+        color_attribute = mesh.color_attributes.active_color or mesh.color_attributes[0]
+        color_node = nodes.new("ShaderNodeVertexColor")
+        color_node.layer_name = color_attribute.name
+        saturation = nodes.new("ShaderNodeHueSaturation")
+        saturation.inputs["Saturation"].default_value = 1.32
+        saturation.inputs["Value"].default_value = 0.78
+        links.new(color_node.outputs["Color"], saturation.inputs["Color"])
+        links.new(saturation.outputs["Color"], principled.inputs["Base Color"])
+    else:
+        principled.inputs["Base Color"].default_value = (0.62, 0.25, 0.055, 1.0)
     principled.inputs["Roughness"].default_value = 0.76
     object_.data.materials.clear()
     object_.data.materials.append(material)
@@ -138,8 +140,11 @@ def main() -> None:
     source = args.input.expanduser().resolve()
     output_dir = args.output_dir.expanduser().resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
-    clear_scene()
-    bpy.ops.import_scene.gltf(filepath=str(source))
+    if source.suffix.lower() == ".blend":
+        bpy.ops.wm.open_mainfile(filepath=str(source))
+    else:
+        clear_scene()
+        bpy.ops.import_scene.gltf(filepath=str(source))
     meshes = [object_ for object_ in bpy.context.scene.objects if object_.type == "MESH"]
     if not meshes:
         raise RuntimeError(f"No mesh objects imported from {source}")
@@ -160,7 +165,8 @@ def main() -> None:
             mesh.select_set(False)
         for polygon in mesh.data.polygons:
             polygon.use_smooth = True
-        add_vertex_color_material(mesh)
+        if not args.preserve_materials:
+            add_preview_material(mesh)
     bpy.context.view_layer.update()
     minimum, maximum = normalize(meshes)
 
@@ -198,6 +204,7 @@ def main() -> None:
             "smooth_factor": args.smooth_factor,
             "smooth_iterations": args.smooth_iterations,
         },
+        "preserve_materials": args.preserve_materials,
         "mesh_objects": [object_.name for object_ in meshes],
         "bounds": {
             "minimum": [round(value, 6) for value in minimum],
