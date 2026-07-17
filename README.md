@@ -345,6 +345,8 @@ Blender art pipeline:
 ```bash
 .venv/bin/python -m pip install -e ".[dev,art]"
 tools/blender/render_idle.sh
+tools/blender/render_realistic_identity.sh
+tools/blender/render_realistic_topology.sh
 ```
 
 Windows uses `.venv\Scripts\lion-cub-pet.exe`.

@@ -84,6 +84,20 @@ evidence in `assets/renders/prototypes/realistic-sculpt-v1/`. It is still isolat
 from the runtime while head/ear/paw topology and the belly projection transition
 remain under review.
 
+Build the isolated clean-topology candidate and compare it against the approved
+identity turntable:
+
+```bash
+tools/blender/render_realistic_topology.sh
+```
+
+This closes the source scan holes, runs deterministic seeded QuadriFlow without
+symmetry, preserves the packed project-owned projection material, renders both
+source and candidate from the same eight views, and fails if manifold/all-quad or
+identity-preservation gates regress. The output is
+`assets/source-3d/leo-realistic-topology.blend`; it is not runtime-approved until
+joint deformation and pet-size visual tests pass.
+
 Build only:
 
 ```bash
