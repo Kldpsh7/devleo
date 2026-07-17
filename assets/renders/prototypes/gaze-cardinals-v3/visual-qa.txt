@@ -1,0 +1,5 @@
+visual_qa=pass
+qa_note=All repaired cardinals are unmistakable at master and 192x208 scale with fixed body/laptop registration, valid eye apertures, clean silhouettes, and preserved young-lion identity.
+cardinal_semantics=000:pass clear upward eyes and head pitch;090:pass unmistakable screen-right profile;180:pass clear downward eyes and head pitch with repaired scalp silhouette;270:pass unmistakable screen-left profile opposing 090
+review_warnings=none
+repair_notes=none

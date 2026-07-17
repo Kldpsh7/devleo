@@ -80,6 +80,10 @@ class GazePose:
             }
             for name, object_ in self.controls.items()
         }
+        # The canonical source carries Idle F-curves. Rendering re-evaluates them at
+        # frame 1 unless this isolated pose renderer detaches the curves first.
+        for object_ in self.controls.values():
+            object_.animation_data_clear()
         eye_surface_names = (
             "Iris_L",
             "Iris_R",
@@ -97,6 +101,16 @@ class GazePose:
             }
             for name, object_ in self.eye_surfaces.items()
         }
+        self.head_fur_modifiers = tuple(
+            modifier
+            for modifier in bpy.data.objects["Head"].modifiers
+            if modifier.type == "PARTICLE_SYSTEM"
+        )
+        # Dense legacy particles form a square pole tuft when the ellipsoidal
+        # head pitches down. A shorter nap keeps the fur finish without exposing
+        # that emitter-pole artifact in the gaze family.
+        for modifier in self.head_fur_modifiers:
+            modifier.particle_system.settings.hair_length = 0.008
 
     def reset(self) -> None:
         for name, object_ in self.controls.items():
@@ -124,12 +138,12 @@ class GazePose:
         camera_offset = camera.matrix_world.translation - head.matrix_world.translation
         camera_yaw = math.degrees(math.atan2(camera_offset.x, -camera_offset.y))
         head.location = (
-            head_baseline["location"].x + 0.045 * screen_x,
+            head_baseline["location"].x + 0.035 * screen_x,
             head_baseline["location"].y,
-            head_baseline["location"].z + 0.040 * screen_up,
+            head_baseline["location"].z + 0.025 * screen_up,
         )
         head.rotation_euler = radians(
-            (-32.0 * screen_up, 2.5 * screen_x * screen_up, camera_yaw + 46.0 * screen_x)
+            (-28.0 * screen_up, 2.0 * screen_x * screen_up, camera_yaw + 45.0 * screen_x)
         )
 
         bpy.context.view_layer.update()
@@ -138,17 +152,17 @@ class GazePose:
         camera_up = camera_rotation @ Vector((0.0, 1.0, 0.0))
         for object_ in self.eye_surfaces.values():
             matrix = object_.matrix_world.copy()
-            matrix.translation += camera_right * (0.075 * screen_x)
-            matrix.translation += camera_up * (0.075 * screen_up)
+            matrix.translation += camera_right * (0.06 * screen_x)
+            matrix.translation += camera_up * (0.06 * screen_up)
             object_.matrix_world = matrix
 
         left_ear = self.controls["CTRL_Ear_L"]
         right_ear = self.controls["CTRL_Ear_R"]
         left_ear.rotation_euler = radians(
-            (-2.5 * screen_up, 0.0, -2.0 * screen_x - 1.0 * screen_up)
+            (-5.0 * screen_up, 0.0, -6.0 * screen_x - 1.0 * screen_up)
         )
         right_ear.rotation_euler = radians(
-            (-2.5 * screen_up, 0.0, 2.0 * screen_x + 1.0 * screen_up)
+            (-5.0 * screen_up, 0.0, 6.0 * screen_x + 1.0 * screen_up)
         )
         self.controls["CTRL_Tail_Flick"].rotation_euler = radians((0.0, 0.0, -2.0 - 1.5 * screen_x))
         bpy.context.view_layer.update()

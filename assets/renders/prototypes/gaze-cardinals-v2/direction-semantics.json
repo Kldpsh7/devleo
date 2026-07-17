@@ -1,6 +1,8 @@
 {
-  "ok": true,
-  "status": "approved-for-full-loop-synthesis",
+  "ok": false,
+  "status": "superseded-after-blind-review",
+  "labeled_review_ok": true,
+  "blind_followup_ok": false,
   "directions": {
     "000": {
       "verdict": "pass",
@@ -27,5 +29,7 @@
       "reason": "Irises shift screen-left with opposing nose, muzzle, and cheek yaw."
     }
   },
-  "review_warnings": []
+  "review_warnings": [
+    "Two of three isolated blind reviewers classified both cardinal axes as ambiguous; the third confirmed verticals but not the horizontal hard gate."
+  ]
 }

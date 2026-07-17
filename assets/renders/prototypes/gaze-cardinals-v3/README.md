@@ -1,11 +1,11 @@
-# Gaze cardinal candidate v2
+# Gaze cardinal candidate v3
 
-This snapshot freezes the second four-cardinal family after the v1 blind-review
-failure. It was superseded by v3 after two of three fresh blind reviewers still
-classified both cardinal axes as ambiguous. It must not be used for runtime art.
+This snapshot freezes the third four-cardinal family after repairing the v2 blind
+failure. It is approved for full 16-direction synthesis, not runtime art.
 
-V2 added camera-compensated head turns and direct whole-iris/pupil surface travel,
-but the isolated A/B test showed that the result was still insufficient.
+V3 detaches canonical Idle F-curves before posing, strengthens screen-axis profile
+turns and ear follow-through, moves complete eye surfaces within their apertures,
+and uses a consistent short head-fur nap to prevent the downward emitter-pole tuft.
 
 - `directions/`: full-resolution transparent `000`, `090`, `180`, and `270` masters.
 - `gaze-directions.png`: neutral-plus-cardinals review sheet.

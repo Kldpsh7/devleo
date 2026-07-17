@@ -6,17 +6,22 @@ from pathlib import Path
 from PySide6.QtGui import QImage, QImageReader
 
 ROOT = Path(__file__).resolve().parents[1]
-SUPERSEDED = ROOT / "assets" / "renders" / "prototypes" / "gaze-cardinals-v1"
-PROTOTYPE = ROOT / "assets" / "renders" / "prototypes" / "gaze-cardinals-v2"
+SUPERSEDED = (
+    ROOT / "assets" / "renders" / "prototypes" / "gaze-cardinals-v1",
+    ROOT / "assets" / "renders" / "prototypes" / "gaze-cardinals-v2",
+)
+PROTOTYPE = ROOT / "assets" / "renders" / "prototypes" / "gaze-cardinals-v3"
 CARDINALS = ("000", "090", "180", "270")
 
 
-def test_first_cardinal_candidate_remains_marked_as_superseded() -> None:
-    semantics = json.loads((SUPERSEDED / "direction-semantics.json").read_text(encoding="utf-8"))
+def test_failed_cardinal_candidates_remain_marked_as_superseded() -> None:
+    for candidate in SUPERSEDED:
+        semantics = json.loads((candidate / "direction-semantics.json").read_text(encoding="utf-8"))
 
-    assert semantics["ok"] is False
-    assert semantics["labeled_review_ok"] is True
-    assert semantics["blind_followup_ok"] is False
+        assert semantics["ok"] is False
+        assert semantics["status"] == "superseded-after-blind-review"
+        assert semantics["labeled_review_ok"] is True
+        assert semantics["blind_followup_ok"] is False
 
 
 def test_gaze_cardinals_retain_passing_qa_snapshot() -> None:

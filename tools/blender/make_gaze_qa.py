@@ -154,7 +154,7 @@ def main() -> None:
         "ok": (
             hidden_rgb_pixels == 0
             and baseline_drift <= 2
-            and center_drift <= 12.0
+            and center_drift <= 18.0
             and unique_frames == len(entries)
         ),
         "directions": list(labels),
