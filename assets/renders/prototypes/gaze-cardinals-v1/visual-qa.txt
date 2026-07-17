@@ -1,0 +1,5 @@
+visual_qa=pass
+qa_note=All cardinals remain readable at 192x208 and master scale while preserving fixed registration, anatomy, laptop geometry, identity, and clean unclipped silhouettes.
+cardinal_semantics=000:pass pupils rise with upward head pitch and visible chin;090:pass pupils, nose, muzzle, and cheek turn screen-right;180:pass pupils lower as the head pitches toward the laptop;270:pass pupils, nose, muzzle, and cheek turn screen-left opposite 090
+review_warnings=Horizontal pupil travel is subtle at 192x208, but accompanying head and muzzle yaw preserves direction readability.
+repair_notes=none

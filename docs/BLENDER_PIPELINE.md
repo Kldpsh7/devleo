@@ -92,6 +92,18 @@ The command produces 12-frame Waiting, 16-frame Working, 12-frame Review, and
 14-frame Failure sequences. QA records alpha, safety margins, baseline and center
 registration, unique motion frames, contact sheets, and real-time GIF previews.
 
+Approve gaze cardinals before rendering intermediate directions:
+
+```bash
+tools/blender/render_gaze_cardinals.sh
+tools/blender/render_gaze_directions.sh
+```
+
+The full gaze command renders 16 clockwise directions from `000` up through
+`337.5` up-left. It keeps the lower body and closed laptop registered, emits
+1152x1248 transparent masters, a normal-size loop, and an isolated 1536x2288 QA
+atlas for the hatch-pet direction semantics, continuity, and blind-review gates.
+
 ## Approval gate
 
 This prototype is intentionally isolated from the live pet. Approval requires the
