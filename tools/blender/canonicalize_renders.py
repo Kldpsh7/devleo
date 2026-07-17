@@ -40,11 +40,14 @@ def main() -> None:
     render_dir = args.render_dir.expanduser().resolve()
     manifest_path = render_dir / "manifest.json"
     manifest: dict[str, Any] = json.loads(manifest_path.read_text(encoding="utf-8"))
-    entries = [
-        manifest["neutral"],
-        *manifest["animation"]["frames"],
-        *manifest.get("identity_views", []),
-    ]
+    animation_entries = (
+        manifest["animation"]["frames"]
+        if "animation" in manifest
+        else [
+            frame for animation in manifest.get("animations", []) for frame in animation["frames"]
+        ]
+    )
+    entries = [manifest["neutral"], *animation_entries, *manifest.get("identity_views", [])]
     for entry in entries:
         path = render_dir / entry["file"]
         canonicalize(path)

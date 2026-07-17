@@ -82,6 +82,16 @@ This produces isolated Idle, Waiting, Working, Review, and Failure poses. The la
 control is closed at 0°, half-open at 48°, and fully open at 96°. These still-pose
 gates must pass before their individual motion loops and transitions are rendered.
 
+Render the approved pose contract as full motion candidates:
+
+```bash
+tools/blender/render_core_animations.sh
+```
+
+The command produces 12-frame Waiting, 16-frame Working, 12-frame Review, and
+14-frame Failure sequences. QA records alpha, safety margins, baseline and center
+registration, unique motion frames, contact sheets, and real-time GIF previews.
+
 ## Approval gate
 
 This prototype is intentionally isolated from the live pet. Approval requires the
