@@ -6,7 +6,7 @@ from pathlib import Path
 from PySide6.QtGui import QImage
 
 ROOT = Path(__file__).resolve().parents[1]
-PROTOTYPE = ROOT / "assets" / "renders" / "prototypes" / "idle-v1"
+PROTOTYPE = ROOT / "assets" / "renders" / "prototypes" / "canonical-v1"
 
 
 def test_blender_idle_prototype_retains_passing_qa_snapshot() -> None:
@@ -19,6 +19,8 @@ def test_blender_idle_prototype_retains_passing_qa_snapshot() -> None:
     assert qa["maximum_corner_alpha"] == 0
     assert qa["hidden_rgb_pixels_under_zero_alpha"] == 0
     assert qa["touches_safety_edge"] is False
+    assert qa["scene_validation"]["rig_bone_count"] == 19
+    assert qa["scene_validation"]["fur_system_count"] >= 18
 
 
 def test_blender_idle_prototype_keeps_source_and_review_artifacts() -> None:
@@ -29,5 +31,12 @@ def test_blender_idle_prototype_keeps_source_and_review_artifacts() -> None:
     assert not neutral.isNull()
     assert (neutral.width(), neutral.height()) == (1152, 1248)
     assert neutral.hasAlphaChannel()
-    for artifact in ("contact-sheet.png", "background-qa.png", "idle-preview.gif", "visual-qa.txt"):
+    for artifact in (
+        "contact-sheet.png",
+        "background-qa.png",
+        "identity-turnaround.png",
+        "scale-qa.png",
+        "idle-preview.gif",
+        "visual-qa.txt",
+    ):
         assert (PROTOTYPE / artifact).stat().st_size > 0

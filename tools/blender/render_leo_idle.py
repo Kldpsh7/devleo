@@ -11,6 +11,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import bpy
+from mathutils import Vector
 
 
 def parse_args() -> argparse.Namespace:
@@ -49,6 +50,76 @@ def disable_render_stamps(scene: bpy.types.Scene) -> None:
             setattr(scene.render, attribute, False)
 
 
+def look_at(object_: bpy.types.Object, target: tuple[float, float, float]) -> None:
+    direction = Vector(target) - object_.location
+    object_.rotation_euler = direction.to_track_quat("-Z", "Y").to_euler()
+
+
+def validate_scene(scene: bpy.types.Scene) -> dict[str, object]:
+    required_objects = {
+        "RIG_Leo",
+        "Head",
+        "Torso",
+        "Chest",
+        "Muzzle_L",
+        "Muzzle_R",
+        "Eye_L",
+        "Eye_R",
+        "Iris_L",
+        "Iris_R",
+        "Tail",
+        "Tail_Tuft",
+        "Laptop_Closed_Lid",
+        "Laptop_Dark_Rim",
+        "Laptop_Hinge",
+        "Leo Camera",
+        "Key softbox",
+        "Fill softbox",
+        "Rim softbox",
+    }
+    required_bones = {
+        "root",
+        "pelvis",
+        "spine",
+        "neck",
+        "head",
+        "foreleg_upper.L",
+        "foreleg_lower.L",
+        "front_paw.L",
+        "hind_thigh.L",
+        "hind_paw.L",
+        "foreleg_upper.R",
+        "foreleg_lower.R",
+        "front_paw.R",
+        "hind_thigh.R",
+        "hind_paw.R",
+        "tail.01",
+        "tail.02",
+        "tail.03",
+        "prop_laptop",
+    }
+    missing_objects = sorted(required_objects - set(bpy.data.objects.keys()))
+    rig = bpy.data.objects.get("RIG_Leo")
+    bone_names = set(rig.data.bones.keys()) if rig is not None and rig.type == "ARMATURE" else set()
+    missing_bones = sorted(required_bones - bone_names)
+    fur_system_count = sum(
+        len(object_.particle_systems) for object_ in bpy.data.objects if object_.type == "MESH"
+    )
+    lid = bpy.data.objects.get("Laptop_Closed_Lid")
+    lid_dimensions = [round(value, 3) for value in lid.dimensions] if lid is not None else []
+    result: dict[str, object] = {
+        "ok": not missing_objects and not missing_bones and fur_system_count >= 18,
+        "asset_status": scene.get("leo_asset_status"),
+        "missing_objects": missing_objects,
+        "missing_bones": missing_bones,
+        "rig_bone_count": len(bone_names),
+        "fur_system_count": fur_system_count,
+        "laptop_lid_dimensions": lid_dimensions,
+        "light_count": sum(1 for object_ in bpy.data.objects if object_.type == "LIGHT"),
+    }
+    return result
+
+
 def main() -> None:
     args = parse_args()
     output_dir = args.output_dir.expanduser().resolve()
@@ -58,6 +129,9 @@ def main() -> None:
     scene = bpy.context.scene
     if scene.get("leo_pipeline_version") != 1:
         raise RuntimeError("The loaded file is not a supported Leo source scene")
+    scene_validation = validate_scene(scene)
+    if not scene_validation["ok"]:
+        raise RuntimeError(f"Leo source scene validation failed: {scene_validation}")
     scene.render.image_settings.file_format = "PNG"
     scene.render.image_settings.color_mode = "RGBA"
     scene.render.image_settings.color_depth = "8"
@@ -70,6 +144,36 @@ def main() -> None:
     neutral_path = output_dir / "neutral.png"
     scene.render.filepath = str(neutral_path)
     bpy.ops.render.render(write_still=True)
+
+    if scene.camera is None:
+        raise RuntimeError("The Leo source scene has no render camera")
+    identity_dir = output_dir / "identity"
+    identity_dir.mkdir(parents=True, exist_ok=True)
+    camera = scene.camera
+    original_matrix = camera.matrix_world.copy()
+    original_ortho_scale = camera.data.ortho_scale
+    identity_views: list[dict[str, object]] = []
+    for name, location, target, ortho_scale in (
+        ("front", (0.0, -14.0, 5.8), (0.0, -0.42, 2.18), 5.65),
+        ("three-quarter", (4.55, -12.8, 6.25), (0.0, -0.42, 2.20), 5.55),
+        ("profile", (13.8, -0.42, 5.8), (0.0, -0.42, 2.18), 5.90),
+    ):
+        camera.location = location
+        camera.data.ortho_scale = ortho_scale
+        look_at(camera, target)
+        path = identity_dir / f"{name}.png"
+        scene.render.filepath = str(path)
+        bpy.ops.render.render(write_still=True)
+        identity_views.append(
+            {
+                "name": name,
+                "file": str(path.relative_to(output_dir)),
+                "sha256": checksum(path),
+                "bytes": path.stat().st_size,
+            }
+        )
+    camera.matrix_world = original_matrix
+    camera.data.ortho_scale = original_ortho_scale
 
     frames: list[dict[str, object]] = []
     for frame in range(scene.frame_start, scene.frame_end + 1):
@@ -96,7 +200,7 @@ def main() -> None:
     manifest = {
         "schema_version": 1,
         "asset": "leo-the-dev",
-        "status": "prototype-not-runtime-approved",
+        "status": "canonical-model-candidate-not-runtime-approved",
         "runtime_replacement": False,
         "generated_at": datetime.now(UTC).isoformat(),
         "generator": {
@@ -128,6 +232,8 @@ def main() -> None:
             "sha256": checksum(neutral_path),
             "bytes": neutral_path.stat().st_size,
         },
+        "identity_views": identity_views,
+        "scene_validation": scene_validation,
     }
     manifest_path = output_dir / "manifest.json"
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")

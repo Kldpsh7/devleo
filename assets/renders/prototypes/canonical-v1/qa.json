@@ -1,0 +1,108 @@
+{
+  "ok": true,
+  "frame_count": 12,
+  "dimensions": [
+    1152,
+    1248
+  ],
+  "mode": "RGBA",
+  "maximum_corner_alpha": 0,
+  "hidden_rgb_pixels_under_zero_alpha": 0,
+  "touches_safety_edge": false,
+  "maximum_center_drift_px": 8.5,
+  "alpha_bboxes": [
+    [
+      142,
+      49,
+      952,
+      1208
+    ],
+    [
+      142,
+      46,
+      955,
+      1208
+    ],
+    [
+      142,
+      42,
+      960,
+      1208
+    ],
+    [
+      142,
+      40,
+      963,
+      1208
+    ],
+    [
+      142,
+      42,
+      959,
+      1208
+    ],
+    [
+      142,
+      45,
+      952,
+      1208
+    ],
+    [
+      142,
+      48,
+      948,
+      1208
+    ],
+    [
+      142,
+      52,
+      956,
+      1208
+    ],
+    [
+      142,
+      54,
+      965,
+      1208
+    ],
+    [
+      142,
+      56,
+      957,
+      1208
+    ],
+    [
+      142,
+      55,
+      951,
+      1208
+    ],
+    [
+      142,
+      51,
+      952,
+      1208
+    ]
+  ],
+  "scene_validation": {
+    "ok": true,
+    "asset_status": "canonical-model-candidate-not-runtime-approved",
+    "missing_objects": [],
+    "missing_bones": [],
+    "rig_bone_count": 19,
+    "fur_system_count": 18,
+    "laptop_lid_dimensions": [
+      2.72,
+      1.58,
+      0.095
+    ],
+    "light_count": 3
+  },
+  "artifacts": {
+    "contact_sheet": "contact-sheet.png",
+    "background_qa": "background-qa.png",
+    "identity_turnaround": "identity-turnaround.png",
+    "scale_qa": "scale-qa.png",
+    "preview": "idle-preview.gif"
+  }
+}

@@ -109,6 +109,66 @@ def material(
     return result
 
 
+def hair_material(name: str, color: str) -> bpy.types.Material:
+    result = bpy.data.materials.new(name)
+    result.use_nodes = True
+    nodes = result.node_tree.nodes
+    nodes.clear()
+    output = nodes.new("ShaderNodeOutputMaterial")
+    hair = nodes.new("ShaderNodeBsdfHairPrincipled")
+    hair.parametrization = "COLOR"
+    set_input(hair, "Color", rgba(color))
+    set_input(hair, "Roughness", 0.34)
+    set_input(hair, "Radial Roughness", 0.42)
+    set_input(hair, "Coat", 0.12)
+    set_input(hair, "IOR", 1.48)
+    set_input(hair, "Random Color", 0.08)
+    set_input(hair, "Random Roughness", 0.12)
+    result.node_tree.links.new(hair.outputs["BSDF"], output.inputs["Surface"])
+    return result
+
+
+def add_fur_system(
+    object_: bpy.types.Object,
+    fur_material: bpy.types.Material,
+    *,
+    count: int,
+    length: float,
+    seed: int,
+) -> None:
+    if fur_material.name not in object_.data.materials:
+        object_.data.materials.append(fur_material)
+    bpy.ops.object.select_all(action="DESELECT")
+    object_.select_set(True)
+    bpy.context.view_layer.objects.active = object_
+    bpy.ops.object.particle_system_add()
+    system = object_.particle_systems[-1]
+    system.name = f"Fur_{object_.name}"
+    system.seed = seed
+    settings = system.settings
+    settings.name = f"FurSettings_{object_.name}"
+    settings.type = "HAIR"
+    settings.count = count
+    settings.hair_length = length
+    settings.hair_step = 3
+    settings.material_slot = fur_material.name
+    settings.display_percentage = 12
+    settings.use_hair_bspline = True
+    settings.root_radius = 0.006
+    settings.tip_radius = 0.0012
+    settings.child_percent = 1
+    settings.rendered_child_count = 8
+    settings.clump_factor = 0.10
+    settings.roughness_1 = 0.003
+    settings.roughness_2 = 0.002
+    settings.roughness_endpoint = 0.003
+    if hasattr(settings, "child_type"):
+        settings.child_type = "INTERPOLATED"
+    if hasattr(settings, "render_type"):
+        settings.render_type = "PATH"
+    settings.effector_weights.gravity = 0.0
+
+
 def apply_smooth(object_: bpy.types.Object) -> None:
     if object_.type != "MESH":
         return
@@ -219,6 +279,82 @@ def look_at(object_: bpy.types.Object, target: tuple[float, float, float]) -> No
     object_.rotation_euler = direction.to_track_quat("-Z", "Y").to_euler()
 
 
+def add_production_rig() -> bpy.types.Object:
+    bpy.ops.object.armature_add(enter_editmode=True, location=(0.0, 0.0, 0.0))
+    rig = bpy.context.object
+    rig.name = "RIG_Leo"
+    rig.data.name = "RIGDATA_Leo"
+    for existing in list(rig.data.edit_bones):
+        rig.data.edit_bones.remove(existing)
+
+    bones: dict[str, bpy.types.EditBone] = {}
+
+    def bone(
+        name: str,
+        head: tuple[float, float, float],
+        tail: tuple[float, float, float],
+        parent: str | None = None,
+    ) -> bpy.types.EditBone:
+        result = rig.data.edit_bones.new(name)
+        result.head = head
+        result.tail = tail
+        if parent is not None:
+            result.parent = bones[parent]
+        bones[name] = result
+        return result
+
+    bone("root", (0.0, 0.1, 0.08), (0.0, 0.1, 0.52))
+    bone("pelvis", (0.0, 0.1, 0.52), (0.0, 0.08, 1.28), "root")
+    bone("spine", (0.0, 0.08, 1.28), (0.0, -0.03, 2.48), "pelvis")
+    bone("neck", (0.0, -0.03, 2.48), (0.0, -0.10, 3.10), "spine")
+    bone("head", (0.0, -0.10, 3.10), (0.0, -0.12, 4.25), "neck")
+    for side, sign in (("L", -1.0), ("R", 1.0)):
+        bone(
+            f"foreleg_upper.{side}",
+            (0.42 * sign, -0.18, 2.10),
+            (0.48 * sign, -0.48, 1.27),
+            "spine",
+        )
+        bone(
+            f"foreleg_lower.{side}",
+            (0.48 * sign, -0.48, 1.27),
+            (0.50 * sign, -0.72, 0.52),
+            f"foreleg_upper.{side}",
+        )
+        bone(
+            f"front_paw.{side}",
+            (0.50 * sign, -0.72, 0.52),
+            (0.52 * sign, -1.05, 0.25),
+            f"foreleg_lower.{side}",
+        )
+        bone(
+            f"hind_thigh.{side}",
+            (0.42 * sign, 0.12, 1.25),
+            (0.72 * sign, 0.13, 0.78),
+            "pelvis",
+        )
+        bone(
+            f"hind_paw.{side}",
+            (0.72 * sign, 0.13, 0.78),
+            (0.68 * sign, -0.72, 0.31),
+            f"hind_thigh.{side}",
+        )
+    bone("tail.01", (0.58, 0.28, 1.18), (1.05, 0.38, 1.05), "pelvis")
+    bone("tail.02", (1.05, 0.38, 1.05), (1.42, 0.02, 0.79), "tail.01")
+    bone("tail.03", (1.42, 0.02, 0.79), (1.16, -0.70, 0.72), "tail.02")
+    laptop = bone("prop_laptop", (0.0, -0.55, 0.30), (0.0, -1.58, 0.30), "root")
+    laptop.use_deform = False
+
+    bpy.ops.object.mode_set(mode="OBJECT")
+    rig.show_in_front = True
+    rig.data.display_type = "OCTAHEDRAL"
+    rig.display_type = "WIRE"
+    rig.hide_render = True
+    rig["rig_version"] = 1
+    rig["rig_contract"] = "root/pelvis/spine/head, quadruped limbs, tail chain, laptop prop"
+    return rig
+
+
 def disable_render_stamps(scene: bpy.types.Scene) -> None:
     scene.render.use_stamp = False
     for attribute in (
@@ -260,14 +396,16 @@ def build_scene() -> bpy.types.Scene:
     with contextlib.suppress(TypeError):
         scene.view_settings.look = "AgX - Medium High Contrast"
     scene["leo_pipeline_version"] = PIPELINE_VERSION
-    scene["leo_asset_status"] = "prototype-not-runtime-approved"
+    scene["leo_asset_status"] = "canonical-model-candidate-not-runtime-approved"
     scene["leo_identity"] = "young quadrupedal lion cub with a silver laptop"
 
     fur = material("Leo golden coat", "C9792E", roughness=0.62, textured=True)
     pale_fur = material("Leo muzzle and chest", "E8B96D", roughness=0.68, textured=True)
     dark_fur = material("Leo markings and tail tuft", "5B2E17", roughness=0.72, textured=True)
+    fur_fibers = hair_material("Leo golden fur fibers", "B96825")
+    pale_fibers = hair_material("Leo pale fur fibers", "DFA85E")
     inner_ear = material("Leo inner ear", "A95745", roughness=0.78)
-    eye_white = material("Warm eye white", "F7EAD1", roughness=0.35, coat=0.18)
+    eye_rim = material("Natural dark eye rim", "2B1B14", roughness=0.34, coat=0.16)
     iris = material("Amber iris", "D89524", roughness=0.24, coat=0.35)
     pupil = material("Eye pupil", "17110D", roughness=0.22, coat=0.25)
     highlight = material("Eye highlight", "FFFFFF", roughness=0.08, coat=0.6)
@@ -346,11 +484,11 @@ def build_scene() -> bpy.types.Scene:
         ("L", -0.34, left_blink, left_gaze),
         ("R", 0.34, right_blink, right_gaze),
     ):
-        globe = add_ellipsoid(f"Eye_{side}", (x, -0.88, 3.84), (0.245, 0.13, 0.30), eye_white)
+        globe = add_ellipsoid(f"Eye_{side}", (x, -0.88, 3.84), (0.205, 0.125, 0.250), eye_rim)
         iris_object = add_ellipsoid(
             f"Iris_{side}",
             (x + 0.05, -1.04, 3.87),
-            (0.135, 0.040, 0.175),
+            (0.155, 0.040, 0.195),
             iris,
             segments=40,
             rings=24,
@@ -392,7 +530,7 @@ def build_scene() -> bpy.types.Scene:
         stripe = add_ellipsoid(
             f"Forehead_Stripe_{index}",
             (x, -0.900, z),
-            (0.055, 0.025, 0.20),
+            (0.045, 0.014, 0.13),
             dark_fur,
             rotation=(0.0, math.radians(angle), 0.0),
             segments=28,
@@ -409,6 +547,18 @@ def build_scene() -> bpy.types.Scene:
     for index, points in enumerate(whisker_specs):
         whisker = add_curve(f"Whisker_{index}", list(points), pale_fur, bevel_depth=0.009)
         parent_keep_transform(whisker, head_ctrl)
+
+    for side, sign in (("L", -1.0), ("R", 1.0)):
+        for index, (x_offset, z_offset) in enumerate(((0.0, 0.0), (0.08, 0.045), (0.09, -0.055))):
+            spot = add_ellipsoid(
+                f"Whisker_Spot_{side}_{index}",
+                (sign * (0.34 + x_offset), -1.145, 3.43 + z_offset),
+                (0.015, 0.009, 0.015),
+                nose,
+                segments=16,
+                rings=10,
+            )
+            parent_keep_transform(spot, head_ctrl)
 
     tail = add_curve(
         "Tail",
@@ -469,6 +619,32 @@ def build_scene() -> bpy.types.Scene:
         )
     laptop_rim["state"] = "closed"
     laptop_rim["design_rule"] = "broad exterior lid remains visible at minimum runtime scale"
+
+    fur_specs = (
+        ("Head", fur_fibers, 8200, 0.028),
+        ("Torso", fur_fibers, 6200, 0.032),
+        ("Chest", pale_fibers, 2400, 0.026),
+        ("Haunch_L", fur_fibers, 3000, 0.030),
+        ("Haunch_R", fur_fibers, 3000, 0.030),
+        ("Muzzle_L", pale_fibers, 1000, 0.022),
+        ("Muzzle_R", pale_fibers, 1000, 0.022),
+        ("Chin", pale_fibers, 650, 0.020),
+        ("Ear_L", fur_fibers, 900, 0.024),
+        ("Ear_R", fur_fibers, 900, 0.024),
+        ("Foreleg_L_Upper", fur_fibers, 1300, 0.026),
+        ("Foreleg_R_Upper", fur_fibers, 1300, 0.026),
+        ("Foreleg_L_Lower", fur_fibers, 1100, 0.025),
+        ("Foreleg_R_Lower", fur_fibers, 1100, 0.025),
+        ("Front_Paw_L", fur_fibers, 950, 0.023),
+        ("Front_Paw_R", fur_fibers, 950, 0.023),
+        ("Hind_Paw_L", fur_fibers, 1100, 0.025),
+        ("Hind_Paw_R", fur_fibers, 1100, 0.025),
+    )
+    for seed, (name, fibers, count, length) in enumerate(fur_specs, start=110):
+        add_fur_system(bpy.data.objects[name], fibers, count=count, length=length, seed=seed)
+
+    rig = add_production_rig()
+    scene["leo_rig_version"] = rig["rig_version"]
 
     camera_data = bpy.data.cameras.new("Leo Camera")
     camera = bpy.data.objects.new("Leo Camera", camera_data)

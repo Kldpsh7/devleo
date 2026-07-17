@@ -40,6 +40,9 @@ def main() -> None:
     render_dir = args.render_dir.expanduser().resolve()
     manifest_path = render_dir / "manifest.json"
     manifest: dict[str, Any] = json.loads(manifest_path.read_text(encoding="utf-8"))
+    scene_validation = manifest.get("scene_validation", {})
+    if not scene_validation.get("ok"):
+        raise ValueError(f"source scene validation failed: {scene_validation}")
     frame_paths = [render_dir / frame["file"] for frame in manifest["animation"]["frames"]]
     frames = [Image.open(path).convert("RGBA") for path in frame_paths]
     if len(frames) != 12:
@@ -115,6 +118,62 @@ def main() -> None:
         bg_draw.text((index * 320 + 10, 354), label, fill=(240, 240, 240), font=font)
     bg_qa.save(render_dir / "background-qa.png", optimize=True)
 
+    identity_views = [
+        (view["name"], Image.open(render_dir / view["file"]).convert("RGBA"))
+        for view in manifest.get("identity_views", [])
+    ]
+    if len(identity_views) != 3:
+        raise ValueError(f"expected three identity views, found {len(identity_views)}")
+    identity_panel = (384, 444)
+    identity_qa = Image.new(
+        "RGB",
+        (identity_panel[0] * len(identity_views), identity_panel[1]),
+        (27, 30, 36),
+    )
+    identity_draw = ImageDraw.Draw(identity_qa)
+    for index, (name, view) in enumerate(identity_views):
+        preview = fit(composite(view, (27, 30, 36)), (identity_panel[0], identity_panel[1] - 30))
+        x = index * identity_panel[0] + (identity_panel[0] - preview.width) // 2
+        identity_qa.paste(preview, (x, 0))
+        identity_draw.text(
+            (index * identity_panel[0] + 12, identity_panel[1] - 22),
+            name,
+            fill=(240, 240, 240),
+            font=font,
+        )
+    identity_qa.save(render_dir / "identity-turnaround.png", optimize=True)
+
+    display_scales = (0.55, 0.75, 1.0, 1.25)
+    scale_backgrounds = (("light", (242, 242, 240)), ("dark", (25, 28, 34)))
+    panel_width = 300
+    panel_height = 310
+    scale_qa = Image.new(
+        "RGB",
+        (panel_width * len(display_scales), panel_height * len(scale_backgrounds)),
+        (28, 30, 35),
+    )
+    scale_draw = ImageDraw.Draw(scale_qa)
+    for row, (background_name, background_color) in enumerate(scale_backgrounds):
+        for column, scale in enumerate(display_scales):
+            target_size = (round(192 * scale), round(208 * scale))
+            sprite = neutral.resize(target_size, Image.Resampling.LANCZOS)
+            panel = Image.new("RGBA", (panel_width, panel_height), (*background_color, 255))
+            panel.alpha_composite(
+                sprite,
+                ((panel_width - sprite.width) // 2, panel_height - sprite.height - 32),
+            )
+            x = column * panel_width
+            y = row * panel_height
+            scale_qa.paste(panel.convert("RGB"), (x, y))
+            label_color = (20, 20, 20) if background_name == "light" else (240, 240, 240)
+            scale_draw.text(
+                (x + 10, y + 9),
+                f"{scale:.2f}x · {target_size[0]}×{target_size[1]} · {background_name}",
+                fill=label_color,
+                font=font,
+            )
+    scale_qa.save(render_dir / "scale-qa.png", optimize=True)
+
     gif_frames = [fit(composite(frame, (26, 29, 35)), (384, 416)) for frame in frames]
     gif_frames[0].save(
         render_dir / "idle-preview.gif",
@@ -136,9 +195,12 @@ def main() -> None:
         "touches_safety_edge": touches_edge,
         "maximum_center_drift_px": round(max_center_drift, 3),
         "alpha_bboxes": [list(bbox) for bbox in bboxes],
+        "scene_validation": scene_validation,
         "artifacts": {
             "contact_sheet": "contact-sheet.png",
             "background_qa": "background-qa.png",
+            "identity_turnaround": "identity-turnaround.png",
+            "scale_qa": "scale-qa.png",
             "preview": "idle-preview.gif",
         },
     }

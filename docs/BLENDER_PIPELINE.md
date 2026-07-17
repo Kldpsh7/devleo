@@ -31,6 +31,8 @@ metadata, clears transparent-pixel RGB, refreshes hashes, then creates:
 - `qa.json`: dimensions, alpha, safety-edge, and registration measurements.
 - `contact-sheet.png`: all twelve frames for pose consistency review.
 - `background-qa.png`: neutral render on light, dark, gray, and saturated backgrounds.
+- `identity-turnaround.png`: front, three-quarter, and profile geometry review.
+- `scale-qa.png`: actual-size 0.55×, 0.75×, 1×, and 1.25× readability matrix.
 - `idle-preview.gif`: the loop at its intended slow six-frame-per-second timing.
 
 Override paths without editing scripts:
@@ -76,3 +78,15 @@ This prototype is intentionally isolated from the live pet. Approval requires th
 same Leo identity in every frame, a readable closed laptop lid at minimum size,
 animal anatomy, transparent clean edges, no clipping, stable paws/baseline, and a
 slow cohesive loop. Only approved renders are exported once per runtime density.
+
+## Canonical scene contract
+
+The Phase 1 source candidate contains a nineteen-bone quadruped rig: root, pelvis,
+spine, neck, head, bilateral foreleg/hind-leg chains, a three-bone tail, and a
+non-deforming laptop prop bone. Eighteen strand-fur systems cover the visible coat
+parts; the transparent render uses a fixed orthographic camera and three-area-light
+setup. The render command rejects missing objects or bones before producing assets.
+
+Identity review uses front, three-quarter, and profile renders. Runtime readability is
+checked at 0.55×, 0.75×, 1×, and 1.25× on light and dark backgrounds. These gates do
+not authorize copying the candidate into the packaged runtime asset tree.
