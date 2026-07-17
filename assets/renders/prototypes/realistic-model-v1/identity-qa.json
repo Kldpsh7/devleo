@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "runtime_replacement": false,
+  "canonical_identity_approved": true,
+  "front_reconstruction": {
+    "mechanical_qa": "pass",
+    "visual_identity": "fail",
+    "accepted_regions": ["face", "forehead", "muzzle", "front paws"],
+    "rejected_regions": ["rear torso", "back", "hindquarters"]
+  },
+  "side_reconstruction": {
+    "mechanical_qa": "pass",
+    "visual_identity": "fail",
+    "accepted_regions": ["torso silhouette", "legs", "tail", "hindquarters"],
+    "rejected_regions": ["frontal face", "facial detail"]
+  },
+  "next_gate": "combined clean sculpt turntable"
+}

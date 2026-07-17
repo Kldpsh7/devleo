@@ -47,6 +47,31 @@ tools/blender/render_idle.sh
 
 ## Individual stages
 
+### Realistic identity reconstruction gate
+
+The realistic rebuild is evaluated independently before rigging or laptop work.
+Its approved modeling references and rejected reconstruction evidence live in
+`assets/renders/prototypes/realistic-model-v1/`.
+
+Render an eight-view preview for any reconstructed GLB:
+
+```bash
+blender --background --factory-startup \
+  --python tools/blender/preview_reconstructed_mesh.py -- \
+  --input /path/to/candidate.glb \
+  --output-dir assets/renders/work/realistic-mesh/candidate \
+  --rotation-x -90 \
+  --smooth-factor 0.55 \
+  --smooth-iterations 12
+.venv/bin/python tools/blender/make_reconstruction_qa.py \
+  --render-dir assets/renders/work/realistic-mesh/candidate
+```
+
+This gate verifies orientation, material color, full-turn anatomy, transparency,
+and framing. A mechanical QA pass does not approve the model: front, profile, and
+rear views must all match the canonical turnaround before the mesh is retained as
+the rig source.
+
 Build only:
 
 ```bash
