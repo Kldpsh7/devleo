@@ -21,8 +21,9 @@ contain no third-party model asset.
 
 The QA sheets passed mechanical checks for eight transparent views, clean corner
 alpha, and frame safety. They failed the final visual-identity gate and are
-reference evidence only. The source meshes remain untracked in
-`assets/renders/work/realistic-mesh/` while a clean combined sculpt is built.
+reference evidence only. Their accepted regions were consolidated into the
+project-owned candidate documented in `../realistic-sculpt-v1/`; the rejected
+single-view meshes remain excluded from runtime and source assets.
 
 ## Integration status
 

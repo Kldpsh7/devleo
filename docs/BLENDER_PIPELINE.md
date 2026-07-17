@@ -72,6 +72,18 @@ and framing. A mechanical QA pass does not approve the model: front, profile, an
 rear views must all match the canonical turnaround before the mesh is retained as
 the rig source.
 
+Rebuild the current project-owned candidate, its deterministic four-view
+projections, eight-view preview, and mechanical QA in one command:
+
+```bash
+tools/blender/render_realistic_identity.sh
+```
+
+The checkpoint is stored in `assets/source-3d/leo-realistic.blend`, with review
+evidence in `assets/renders/prototypes/realistic-sculpt-v1/`. It is still isolated
+from the runtime while head/ear/paw topology and the dorsal projection transition
+remain under review.
+
 Build only:
 
 ```bash

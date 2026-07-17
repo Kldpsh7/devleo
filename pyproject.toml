@@ -43,6 +43,7 @@ dev = [
   "twine>=5.1",
 ]
 art = [
+  "numpy>=1.26",
   "Pillow>=10.4",
 ]
 

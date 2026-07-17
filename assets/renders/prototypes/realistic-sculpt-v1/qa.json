@@ -1,0 +1,63 @@
+{
+  "ok": true,
+  "view_count": 8,
+  "dimensions": [
+    768,
+    832
+  ],
+  "maximum_corner_alpha": 0,
+  "edge_failures": [],
+  "alpha_bboxes": [
+    [
+      47,
+      177,
+      721,
+      670
+    ],
+    [
+      169,
+      229,
+      640,
+      696
+    ],
+    [
+      274,
+      253,
+      494,
+      711
+    ],
+    [
+      141,
+      237,
+      655,
+      697
+    ],
+    [
+      47,
+      181,
+      721,
+      673
+    ],
+    [
+      128,
+      139,
+      599,
+      692
+    ],
+    [
+      274,
+      116,
+      494,
+      702
+    ],
+    [
+      112,
+      130,
+      627,
+      694
+    ]
+  ],
+  "artifacts": {
+    "turntable_contact_sheet": "turntable-contact-sheet.png"
+  }
+}

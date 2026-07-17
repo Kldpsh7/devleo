@@ -14,5 +14,5 @@
     "accepted_regions": ["torso silhouette", "legs", "tail", "hindquarters"],
     "rejected_regions": ["frontal face", "facial detail"]
   },
-  "next_gate": "combined clean sculpt turntable"
+  "next_gate": "realistic-sculpt-v1 clean deformation topology turntable"
 }
