@@ -1,7 +1,7 @@
 # Realistic Leo diagonal face reference v2
 
-Status: project-owned visual target candidate; not a mesh, rig, animation, or
-runtime replacement.
+Status: approved project-owned Leo identity target; not yet a mesh, rig,
+animation, or runtime replacement.
 
 `diagonal-turnaround.png` supplies the four views absent from the original
 cardinal turnaround:
@@ -23,8 +23,7 @@ Why this checkpoint exists:
   diagonal reprojection were tested in ignored work directories and rejected;
 - the runtime pet was never replaced by those experiments.
 
-The next gate is explicit visual approval of this eight-view identity target.
-Only then should the head be sculpted as geometry with anatomical eye sockets,
-muzzle planes, jaw, nose, and ears. Painted facial projections are not an
-acceptable substitute for that geometry.
-
+Kuldeep Sharma approved this visual target on 2026-07-17. It is now the
+canonical face, cub proportions, coat, paws, ears, and age reference for every
+new pose and render. The next gate is pose generation with this identity locked.
+Painted facial projections over mismatched geometry remain unacceptable.

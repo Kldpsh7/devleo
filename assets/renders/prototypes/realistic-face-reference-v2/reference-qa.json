@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "visual-target-candidate",
+  "status": "approved-visual-target",
   "runtime_replacement": false,
   "source": "../realistic-model-v1/modeling-turnaround.png",
   "source_sha256": "76da5771c9a9c2edf1aed6045ebbb987944b35b2eea95d8ff3538a813371510d",
@@ -20,5 +20,9 @@
     "no_extra_subjects": true,
     "no_text_or_watermark": true
   },
-  "visual_approval": "pending"
+  "visual_approval": {
+    "status": "approved",
+    "approved_by": "Kuldeep Sharma",
+    "approved_at": "2026-07-17"
+  }
 }
