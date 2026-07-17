@@ -412,6 +412,7 @@ def build_scene() -> bpy.types.Scene:
     nose = material("Nose", "3A201C", roughness=0.48, coat=0.12)
     laptop_silver = material("Laptop silver", "AEB4BC", roughness=0.25, metallic=0.82)
     laptop_edge = material("Laptop edge", "343A42", roughness=0.34, metallic=0.55)
+    laptop_dark = material("Laptop screen and keyboard", "11161D", roughness=0.30, metallic=0.18)
 
     body_ctrl = add_empty("CTRL_Body_Breath", (0.0, 0.0, 1.7))
     head_ctrl = add_empty("CTRL_Head_Glance", (0.0, -0.10, 3.68))
@@ -422,6 +423,7 @@ def build_scene() -> bpy.types.Scene:
     right_gaze = add_empty("CTRL_Eye_Gaze_R", (0.43, -0.995, 3.895))
     left_ear_ctrl = add_empty("CTRL_Ear_L", (-0.70, -0.03, 4.23))
     right_ear_ctrl = add_empty("CTRL_Ear_R", (0.70, -0.03, 4.23))
+    laptop_lid_ctrl = add_empty("CTRL_Laptop_Lid", (0.0, -2.13, 0.265))
 
     body_parts = [
         add_ellipsoid("Torso", (0.0, 0.04, 2.03), (0.83, 0.69, 1.20), fur),
@@ -585,17 +587,52 @@ def build_scene() -> bpy.types.Scene:
     parent_keep_transform(head_ctrl, body_ctrl)
 
     laptop_rim = add_rounded_cube(
-        "Laptop_Dark_Rim", (0.0, -1.37, 0.185), (2.82, 1.68, 0.10), laptop_edge, bevel=0.08
+        "Laptop_Dark_Rim", (0.0, -1.37, 0.160), (2.82, 1.68, 0.10), laptop_edge, bevel=0.08
     )
     add_rounded_cube(
+        "Laptop_Base_Deck",
+        (0.0, -1.37, 0.205),
+        (2.72, 1.58, 0.075),
+        laptop_silver,
+        bevel=0.07,
+    )
+    add_rounded_cube(
+        "Laptop_Keyboard_Well",
+        (0.0, -1.16, 0.247),
+        (2.18, 0.80, 0.018),
+        laptop_dark,
+        bevel=0.035,
+    )
+    add_rounded_cube(
+        "Laptop_Trackpad",
+        (0.0, -1.78, 0.247),
+        (0.92, 0.44, 0.016),
+        laptop_edge,
+        bevel=0.045,
+    )
+    laptop_lid_rim = add_rounded_cube(
+        "Laptop_Lid_Rim",
+        (0.0, -1.37, 0.250),
+        (2.80, 1.66, 0.060),
+        laptop_edge,
+        bevel=0.08,
+    )
+    laptop_screen = add_rounded_cube(
+        "Laptop_Screen",
+        (0.0, -1.37, 0.224),
+        (2.55, 1.40, 0.018),
+        laptop_dark,
+        bevel=0.055,
+    )
+    laptop_lid = add_rounded_cube(
         "Laptop_Closed_Lid",
-        (0.0, -1.37, 0.255),
-        (2.72, 1.58, 0.095),
+        (0.0, -1.37, 0.292),
+        (2.72, 1.58, 0.065),
         laptop_silver,
         bevel=0.075,
     )
     add_rounded_cube(
-        "Laptop_Hinge", (0.0, -0.61, 0.315), (2.32, 0.11, 0.10), laptop_edge, bevel=0.04
+        "Laptop_Hinge", (0.0, -2.13, 0.315), (2.32, 0.11, 0.10), laptop_edge, bevel=0.04
     )
     paw_pad = add_ellipsoid(
         "Laptop_Paw_Emblem_Pad",
@@ -606,10 +643,11 @@ def build_scene() -> bpy.types.Scene:
         rings=16,
     )
     paw_pad.rotation_euler.z = math.radians(8)
+    paw_emblem_parts = [paw_pad]
     for index, (x, y, scale) in enumerate(
         ((-0.19, -1.26, 0.07), (-0.065, -1.19, 0.075), (0.07, -1.19, 0.075), (0.19, -1.27, 0.07))
     ):
-        add_ellipsoid(
+        toe = add_ellipsoid(
             f"Laptop_Paw_Emblem_Toe_{index}",
             (x, y, 0.329),
             (scale, scale * 0.86, 0.022),
@@ -617,6 +655,12 @@ def build_scene() -> bpy.types.Scene:
             segments=24,
             rings=12,
         )
+        paw_emblem_parts.append(toe)
+    for part in (laptop_lid_rim, laptop_screen, laptop_lid, *paw_emblem_parts):
+        parent_keep_transform(part, laptop_lid_ctrl)
+    laptop_lid_ctrl["closed_degrees"] = 0.0
+    laptop_lid_ctrl["waiting_degrees"] = 48.0
+    laptop_lid_ctrl["working_degrees"] = 96.0
     laptop_rim["state"] = "closed"
     laptop_rim["design_rule"] = "broad exterior lid remains visible at minimum runtime scale"
 

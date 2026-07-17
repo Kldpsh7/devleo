@@ -72,6 +72,16 @@ Regenerate QA only:
   --render-dir assets/renders/work/idle-prototype
 ```
 
+Render the core laptop/state pose contract:
+
+```bash
+tools/blender/render_state_poses.sh
+```
+
+This produces isolated Idle, Waiting, Working, Review, and Failure poses. The laptop
+control is closed at 0°, half-open at 48°, and fully open at 96°. These still-pose
+gates must pass before their individual motion loops and transitions are rendered.
+
 ## Approval gate
 
 This prototype is intentionally isolated from the live pet. Approval requires the
