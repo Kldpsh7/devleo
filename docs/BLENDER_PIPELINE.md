@@ -137,6 +137,17 @@ approved flank carry so a roaming cycle does not snap between seated and moving
 poses. The transition wrapper registers each frame to the canonical master ground
 line before generating QA artifacts.
 
+Export the approved Blender families into isolated runtime density tiers:
+
+```bash
+tools/blender/export_runtime_assets.sh
+```
+
+The exporter produces full 1×, 2×, and 4× frame families plus a Codex-compatible
+8×11 v2 atlas at each density. It samples only the fixed compatibility atlas
+counts; full Blender frame counts remain available beside the atlases. No output
+is copied into the live package before final export QA and visual approval.
+
 ## Approval gate
 
 This prototype is intentionally isolated from the live pet. Approval requires the
