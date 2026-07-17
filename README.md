@@ -300,7 +300,8 @@ The same menu is available from the system tray and by right-clicking Leo:
 - A single animation state machine shared by all operating systems.
 - Local IPC so CLI commands control the running GUI process without spawning duplicates.
 
-See [Architecture](docs/ARCHITECTURE.md) and [Graphics quality](docs/GRAPHICS_QUALITY.md).
+See [Architecture](docs/ARCHITECTURE.md), [Graphics quality](docs/GRAPHICS_QUALITY.md),
+and the [Blender production pipeline](docs/BLENDER_PIPELINE.md).
 
 ## Repository layout
 
@@ -309,7 +310,9 @@ lion-cub-pet/
 ├── assets/
 │   ├── README.md
 │   ├── source/          # original high-resolution working art
+│   ├── source-3d/       # reproducible Blender source scenes
 │   ├── approved/        # reviewed master frames and metadata
+│   ├── renders/         # Blender work/approval boundaries
 │   └── runtime/         # deterministic runtime exports
 ├── docs/
 │   ├── ARCHITECTURE.md
@@ -322,7 +325,7 @@ lion-cub-pet/
 │   ├── platform/
 │   └── assets/
 ├── tests/
-├── scripts/
+├── tools/blender/       # headless scene, render, and QA pipeline
 ├── pyproject.toml
 └── README.md
 ```
@@ -335,6 +338,13 @@ For local development without `uv`:
 python3 -m venv .venv
 .venv/bin/python -m pip install -e ".[dev]"
 .venv/bin/lion-cub-pet install --start
+```
+
+Blender art pipeline:
+
+```bash
+.venv/bin/python -m pip install -e ".[dev,art]"
+tools/blender/render_idle.sh
 ```
 
 Windows uses `.venv\Scripts\lion-cub-pet.exe`.
