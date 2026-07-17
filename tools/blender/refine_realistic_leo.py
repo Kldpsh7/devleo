@@ -33,6 +33,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--textures-dir", type=Path)
     parser.add_argument("--smooth-factor", type=float, default=0.50)
     parser.add_argument("--smooth-iterations", type=int, default=5)
+    parser.add_argument("--projection-power", type=float, default=3.0)
+    parser.add_argument("--skip-reshape", action="store_true")
+    parser.add_argument("--use-alpha-textures", action="store_true")
     args = sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else []
     return parser.parse_args(args)
 
@@ -235,13 +238,23 @@ def add_curve(
     return object_
 
 
-def apply_turnaround_projection(body: bpy.types.Object, textures_dir: Path) -> None:
+def apply_turnaround_projection(
+    body: bpy.types.Object,
+    textures_dir: Path,
+    *,
+    projection_power: float = 3.0,
+    use_alpha_textures: bool = False,
+) -> None:
     """Blend four approved turnaround views over the project-owned sculpt."""
     paths = {
         name: (
-            textures_dir / f"{name}-projection.png"
-            if (textures_dir / f"{name}-projection.png").exists()
-            else textures_dir / f"{name}.png"
+            textures_dir / f"{name}.png"
+            if use_alpha_textures
+            else (
+                textures_dir / f"{name}-projection.png"
+                if (textures_dir / f"{name}-projection.png").exists()
+                else textures_dir / f"{name}.png"
+            )
         )
         for name in ("front", "left", "rear", "right")
     }
@@ -286,7 +299,7 @@ def apply_turnaround_projection(body: bpy.types.Object, textures_dir: Path) -> N
         links.new(source, maximum.inputs[0])
         power = nodes.new("ShaderNodeMath")
         power.operation = "POWER"
-        power.inputs[1].default_value = 3.0
+        power.inputs[1].default_value = projection_power
         links.new(maximum.outputs[0], power.inputs[0])
         return power.outputs[0]
 
@@ -307,7 +320,7 @@ def apply_turnaround_projection(body: bpy.types.Object, textures_dir: Path) -> N
     links.new(separate_normal.outputs["Z"], vertical_absolute.inputs[0])
     vertical_power = nodes.new("ShaderNodeMath")
     vertical_power.operation = "POWER"
-    vertical_power.inputs[1].default_value = 3.0
+    vertical_power.inputs[1].default_value = projection_power
     links.new(vertical_absolute.outputs[0], vertical_power.inputs[0])
     weights["vertical"] = vertical_power.outputs[0]
 
@@ -501,9 +514,15 @@ def main() -> None:
     if body is None or body.type != "MESH":
         raise RuntimeError("Expected Leo_Realistic_Body mesh in the input sculpt")
     smooth_body(body, args.smooth_factor, args.smooth_iterations)
-    reshape_head(body)
+    if not args.skip_reshape:
+        reshape_head(body)
     if args.textures_dir is not None:
-        apply_turnaround_projection(body, args.textures_dir.expanduser().resolve())
+        apply_turnaround_projection(
+            body,
+            args.textures_dir.expanduser().resolve(),
+            projection_power=args.projection_power,
+            use_alpha_textures=args.use_alpha_textures,
+        )
     else:
         sculpt_eye_sockets(body)
         build_face()
