@@ -1,0 +1,8 @@
+visual_qa=pass
+qa_note=Wave and Jump preserve Leo's young-lion identity, connected anatomy, clean silhouettes, stable props, and smooth state-specific motion at master and 192x208 scale.
+gesture_verdicts=wave:pass unmistakable seated friendly wave with a complete connected shoulder-to-paw chain and visible lateral sweep;jump:pass quadrupedal crouch, spring, eight-frame all-paw flight, and controlled landing with plausible tucked limbs
+endpoint_verdict=pass both animations return exactly to their initial frame without snap
+laptop_verdict=pass Wave keeps the closed floor laptop fixed while Jump keeps a constant-size secured flank laptop with stable geometry
+motion_evidence=wave:frames 1-3 raise the full foreleg, 4-6 sweep the paw side-to-side, and 7-9 lower smoothly to the exact start|jump:frames 0-1 crouch, 2-9 launch and remain airborne, frame 10 lands, and frame 11 exactly restores the start
+review_warnings=none
+repair_notes=none

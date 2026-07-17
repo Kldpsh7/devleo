@@ -1,0 +1,194 @@
+{
+  "ok": true,
+  "animations": {
+    "wave": {
+      "ok": true,
+      "frame_count": 10,
+      "frame_duration_ms": 150,
+      "loop": false,
+      "dimensions": [
+        1152,
+        1248
+      ],
+      "normal_cell_dimensions": [
+        192,
+        208
+      ],
+      "hidden_rgb_pixels_under_zero_alpha": 0,
+      "touches_safety_edge": false,
+      "maximum_center_drift_px": 5.7,
+      "maximum_baseline_drift_px": 0,
+      "unique_frame_hashes": 9,
+      "endpoint_sha256_match": true,
+      "airborne_frames": 0,
+      "alpha_bboxes": [
+        [
+          142,
+          48,
+          952,
+          1214
+        ],
+        [
+          142,
+          44,
+          956,
+          1214
+        ],
+        [
+          142,
+          42,
+          954,
+          1214
+        ],
+        [
+          142,
+          40,
+          944,
+          1214
+        ],
+        [
+          142,
+          39,
+          945,
+          1214
+        ],
+        [
+          142,
+          39,
+          959,
+          1214
+        ],
+        [
+          142,
+          40,
+          960,
+          1214
+        ],
+        [
+          142,
+          42,
+          950,
+          1214
+        ],
+        [
+          142,
+          44,
+          948,
+          1214
+        ],
+        [
+          142,
+          48,
+          952,
+          1214
+        ]
+      ],
+      "artifacts": {
+        "contact_sheet": "wave-contact-sheet.png",
+        "preview": "wave-preview.gif"
+      }
+    },
+    "jump": {
+      "ok": true,
+      "frame_count": 12,
+      "frame_duration_ms": 110,
+      "loop": false,
+      "dimensions": [
+        1152,
+        1248
+      ],
+      "normal_cell_dimensions": [
+        192,
+        208
+      ],
+      "hidden_rgb_pixels_under_zero_alpha": 0,
+      "touches_safety_edge": false,
+      "maximum_center_drift_px": 107.5,
+      "maximum_baseline_drift_px": 115,
+      "unique_frame_hashes": 11,
+      "endpoint_sha256_match": true,
+      "airborne_frames": 8,
+      "alpha_bboxes": [
+        [
+          318,
+          397,
+          1080,
+          1039
+        ],
+        [
+          320,
+          398,
+          1081,
+          1023
+        ],
+        [
+          316,
+          373,
+          1089,
+          993
+        ],
+        [
+          310,
+          331,
+          1098,
+          959
+        ],
+        [
+          310,
+          312,
+          1097,
+          938
+        ],
+        [
+          316,
+          299,
+          1087,
+          924
+        ],
+        [
+          323,
+          296,
+          1073,
+          925
+        ],
+        [
+          327,
+          305,
+          1062,
+          940
+        ],
+        [
+          328,
+          330,
+          1061,
+          964
+        ],
+        [
+          326,
+          368,
+          1067,
+          995
+        ],
+        [
+          322,
+          392,
+          1076,
+          1023
+        ],
+        [
+          318,
+          397,
+          1080,
+          1039
+        ]
+      ],
+      "artifacts": {
+        "contact_sheet": "jump-contact-sheet.png",
+        "preview": "jump-preview.gif"
+      }
+    }
+  },
+  "artifacts": {
+    "background_qa": "gesture-background-qa.png"
+  }
+}

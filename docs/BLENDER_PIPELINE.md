@@ -115,6 +115,16 @@ canonical source without modifying it. The closed laptop remains secured against
 Leo's flank while deterministic QA checks master alpha, registration, cadence, and
 the Run airborne phase.
 
+Render one-shot Wave and Jump gestures after locomotion approval:
+
+```bash
+tools/blender/render_gestures.sh
+```
+
+Wave raises a complete seated front-leg chain. Jump uses the quadrupedal carry pose
+for a four-paw spring with an airborne phase. Both return exactly to their source
+pose and keep the laptop closed.
+
 ## Approval gate
 
 This prototype is intentionally isolated from the live pet. Approval requires the

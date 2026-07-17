@@ -122,6 +122,11 @@ class LocomotionPose:
         for object_ in laptop_roots:
             keep_world_parent(object_, self.laptop)
         keep_world_parent(self.laptop, self.body)
+        self.laptop_baseline = {
+            "location": self.laptop.location.copy(),
+            "rotation": self.laptop.rotation_euler.copy(),
+            "scale": self.laptop.scale.copy(),
+        }
 
         for name, length in (
             ("Head", 0.008),
@@ -140,6 +145,9 @@ class LocomotionPose:
             object_.location = baseline["location"]
             object_.rotation_euler = baseline["rotation"]
             object_.scale = baseline["scale"]
+        self.laptop.location = self.laptop_baseline["location"]
+        self.laptop.rotation_euler = self.laptop_baseline["rotation"]
+        self.laptop.scale = self.laptop_baseline["scale"]
         self.lid.rotation_euler.x = 0.0
 
     def set_part(
