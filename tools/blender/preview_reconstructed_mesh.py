@@ -54,8 +54,12 @@ def normalize(objects: list[bpy.types.Object]) -> tuple[Vector, Vector]:
     minimum, maximum = world_bounds(objects)
     dimensions = maximum - minimum
     scale = 3.75 / max(dimensions)
+    scale_matrix = Matrix.Scale(scale, 4)
     for object_ in objects:
-        object_.scale *= scale
+        # Scale the complete world transform so multi-object candidates keep
+        # their facial details attached. Scaling only object.scale leaves each
+        # object's origin in place and pulls eyes/muzzle parts off the body.
+        object_.matrix_world = scale_matrix @ object_.matrix_world
     bpy.context.view_layer.update()
     minimum, maximum = world_bounds(objects)
     center = (minimum + maximum) / 2
