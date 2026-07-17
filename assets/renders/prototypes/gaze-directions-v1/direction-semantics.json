@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "status": "approved-for-runtime-integration",
+  "directions": {
+    "000": {"verdict": "pass", "expected": "up", "observed": "up", "reason": "Elevated eyes and head read up."},
+    "022.5": {"verdict": "pass", "expected": "up-right", "observed": "up-right", "reason": "Slight right yaw plus elevated eyes."},
+    "045": {"verdict": "pass", "expected": "up-right", "observed": "up-right", "reason": "Rightward muzzle with upward pitch."},
+    "067.5": {"verdict": "pass", "expected": "up-right", "observed": "up-right", "reason": "Strong right profile retains upward eye angle."},
+    "090": {"verdict": "pass", "expected": "right", "observed": "right", "reason": "Unmistakable screen-right profile."},
+    "112.5": {"verdict": "pass", "expected": "down-right", "observed": "down-right", "reason": "Right profile with lowered eyes and muzzle."},
+    "135": {"verdict": "pass", "expected": "down-right", "observed": "down-right", "reason": "Clear right yaw and downward pitch."},
+    "157.5": {"verdict": "pass", "expected": "down-right", "observed": "down-right", "reason": "Slight right yaw remains through near-full down."},
+    "180": {"verdict": "pass", "expected": "down", "observed": "down", "reason": "Unmistakable down pose with repaired scalp intact."},
+    "202.5": {"verdict": "pass", "expected": "down-left", "observed": "down-left", "reason": "Slight left yaw plus downward eyes."},
+    "225": {"verdict": "pass", "expected": "down-left", "observed": "down-left", "reason": "Clear left yaw and downward pitch."},
+    "247.5": {"verdict": "pass", "expected": "down-left", "observed": "down-left", "reason": "Strong left profile retains downward eye angle."},
+    "270": {"verdict": "pass", "expected": "left", "observed": "left", "reason": "Unmistakable screen-left profile."},
+    "292.5": {"verdict": "pass", "expected": "up-left", "observed": "up-left", "reason": "Left profile with rising eyes and muzzle."},
+    "315": {"verdict": "pass", "expected": "up-left", "observed": "up-left", "reason": "Clear left yaw and upward pitch."},
+    "337.5": {"verdict": "pass", "expected": "up-left", "observed": "up-left", "reason": "Subtle left yaw plus strong upward pitch transitions naturally into 000."}
+  },
+  "axis_evidence": {
+    "horizontal": "Right-side diagonals progressively yaw eyes, nose, muzzle, and profile screen-right while left-side diagonals mirror screen-left; 337.5 remains subtly left between 315 and 000.",
+    "vertical": "000 to 090 progressively reduces upward pitch, 090 to 180 gains downward pitch, and the pattern mirrors continuously through 270 back to 000."
+  },
+  "review_warnings": [
+    "The 337.5 horizontal cue is blind-ambiguous at 192x208; labeled landmarks and the smooth 315 -> 337.5 -> 000 sequence confirm up-left without reversal."
+  ]
+}

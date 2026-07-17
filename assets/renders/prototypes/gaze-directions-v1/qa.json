@@ -1,0 +1,236 @@
+{
+  "ok": true,
+  "directions": [
+    "000",
+    "022.5",
+    "045",
+    "067.5",
+    "090",
+    "112.5",
+    "135",
+    "157.5",
+    "180",
+    "202.5",
+    "225",
+    "247.5",
+    "270",
+    "292.5",
+    "315",
+    "337.5"
+  ],
+  "expected": [
+    "up",
+    "up-right",
+    "up-right",
+    "up-right",
+    "right",
+    "down-right",
+    "down-right",
+    "down-right",
+    "down",
+    "down-left",
+    "down-left",
+    "down-left",
+    "left",
+    "up-left",
+    "up-left",
+    "up-left"
+  ],
+  "dimensions": [
+    1152,
+    1248
+  ],
+  "normal_cell_dimensions": [
+    192,
+    208
+  ],
+  "hidden_rgb_pixels_under_zero_alpha": 0,
+  "maximum_center_drift_px": 17.03,
+  "maximum_baseline_drift_px": 0,
+  "unique_frame_hashes": 16,
+  "alpha_bboxes": [
+    [
+      142,
+      66,
+      952,
+      1214
+    ],
+    [
+      142,
+      56,
+      951,
+      1214
+    ],
+    [
+      142,
+      45,
+      950,
+      1214
+    ],
+    [
+      142,
+      35,
+      950,
+      1214
+    ],
+    [
+      142,
+      33,
+      950,
+      1214
+    ],
+    [
+      142,
+      44,
+      950,
+      1214
+    ],
+    [
+      142,
+      66,
+      950,
+      1214
+    ],
+    [
+      142,
+      93,
+      951,
+      1214
+    ],
+    [
+      142,
+      100,
+      952,
+      1214
+    ],
+    [
+      142,
+      92,
+      953,
+      1214
+    ],
+    [
+      142,
+      66,
+      954,
+      1214
+    ],
+    [
+      142,
+      44,
+      954,
+      1214
+    ],
+    [
+      142,
+      32,
+      954,
+      1214
+    ],
+    [
+      142,
+      32,
+      954,
+      1214
+    ],
+    [
+      142,
+      40,
+      954,
+      1214
+    ],
+    [
+      142,
+      53,
+      953,
+      1214
+    ]
+  ],
+  "continuity": [
+    {
+      "from": "000",
+      "to": "022.5",
+      "different_pixels": 1307
+    },
+    {
+      "from": "022.5",
+      "to": "045",
+      "different_pixels": 1397
+    },
+    {
+      "from": "045",
+      "to": "067.5",
+      "different_pixels": 1436
+    },
+    {
+      "from": "067.5",
+      "to": "090",
+      "different_pixels": 1392
+    },
+    {
+      "from": "090",
+      "to": "112.5",
+      "different_pixels": 1439
+    },
+    {
+      "from": "112.5",
+      "to": "135",
+      "different_pixels": 1493
+    },
+    {
+      "from": "135",
+      "to": "157.5",
+      "different_pixels": 1545
+    },
+    {
+      "from": "157.5",
+      "to": "180",
+      "different_pixels": 1581
+    },
+    {
+      "from": "180",
+      "to": "202.5",
+      "different_pixels": 1574
+    },
+    {
+      "from": "202.5",
+      "to": "225",
+      "different_pixels": 1529
+    },
+    {
+      "from": "225",
+      "to": "247.5",
+      "different_pixels": 1475
+    },
+    {
+      "from": "247.5",
+      "to": "270",
+      "different_pixels": 1415
+    },
+    {
+      "from": "270",
+      "to": "292.5",
+      "different_pixels": 1353
+    },
+    {
+      "from": "292.5",
+      "to": "315",
+      "different_pixels": 1413
+    },
+    {
+      "from": "315",
+      "to": "337.5",
+      "different_pixels": 1373
+    },
+    {
+      "from": "337.5",
+      "to": "000",
+      "different_pixels": 1306
+    }
+  ],
+  "artifacts": {
+    "sheet": "gaze-directions.png",
+    "preview": "gaze-preview.gif",
+    "qa_atlas": "gaze-atlas-qa.webp"
+  }
+}
