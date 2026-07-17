@@ -347,6 +347,7 @@ Blender art pipeline:
 tools/blender/render_idle.sh
 tools/blender/render_realistic_identity.sh
 tools/blender/render_realistic_topology.sh
+tools/blender/render_realistic_rig.sh
 ```
 
 Windows uses `.venv\Scripts\lion-cub-pet.exe`.

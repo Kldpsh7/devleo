@@ -98,6 +98,18 @@ identity-preservation gates regress. The output is
 `assets/source-3d/leo-realistic-topology.blend`; it is not runtime-approved until
 joint deformation and pet-size visual tests pass.
 
+Build the isolated quadruped rig and its front/side deformation smoke test:
+
+```bash
+tools/blender/render_realistic_rig.sh
+```
+
+The rig stage binds the clean topology to a 22-bone feline hierarchy, localizes
+heat weights with smooth anatomical falloffs, limits each vertex to four deform
+influences, and renders neutral, head yaw/pitch, foreleg, hind-leg, and tail tests.
+Its retained checkpoint is `assets/source-3d/leo-realistic-rig.blend`; diagnostic
+poses prove deformation continuity but are not production animation cycles.
+
 Build only:
 
 ```bash
