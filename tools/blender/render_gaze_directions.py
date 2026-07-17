@@ -80,10 +80,32 @@ class GazePose:
             }
             for name, object_ in self.controls.items()
         }
+        eye_surface_names = (
+            "Iris_L",
+            "Iris_R",
+            "Pupil_L",
+            "Pupil_R",
+            "Eye_Glint_L",
+            "Eye_Glint_R",
+        )
+        self.eye_surfaces = {name: bpy.data.objects[name] for name in eye_surface_names}
+        self.eye_surface_baselines = {
+            name: {
+                "location": object_.location.copy(),
+                "rotation": object_.rotation_euler.copy(),
+                "scale": object_.scale.copy(),
+            }
+            for name, object_ in self.eye_surfaces.items()
+        }
 
     def reset(self) -> None:
         for name, object_ in self.controls.items():
             baseline = self.baselines[name]
+            object_.location = baseline["location"]
+            object_.rotation_euler = baseline["rotation"]
+            object_.scale = baseline["scale"]
+        for name, object_ in self.eye_surfaces.items():
+            baseline = self.eye_surface_baselines[name]
             object_.location = baseline["location"]
             object_.rotation_euler = baseline["rotation"]
             object_.scale = baseline["scale"]
@@ -98,25 +120,27 @@ class GazePose:
 
         head = self.controls["CTRL_Head_Glance"]
         head_baseline = self.baselines["CTRL_Head_Glance"]
+        camera = bpy.context.scene.camera
+        camera_offset = camera.matrix_world.translation - head.matrix_world.translation
+        camera_yaw = math.degrees(math.atan2(camera_offset.x, -camera_offset.y))
         head.location = (
-            head_baseline["location"].x + 0.025 * screen_x,
+            head_baseline["location"].x + 0.045 * screen_x,
             head_baseline["location"].y,
-            head_baseline["location"].z + 0.022 * screen_up,
+            head_baseline["location"].z + 0.040 * screen_up,
         )
         head.rotation_euler = radians(
-            (-20.0 * screen_up, 2.2 * screen_x * screen_up, 30.0 * screen_x)
+            (-32.0 * screen_up, 2.5 * screen_x * screen_up, camera_yaw + 46.0 * screen_x)
         )
 
         bpy.context.view_layer.update()
-        camera_rotation = bpy.context.scene.camera.matrix_world.to_quaternion()
+        camera_rotation = camera.matrix_world.to_quaternion()
         camera_right = camera_rotation @ Vector((1.0, 0.0, 0.0))
         camera_up = camera_rotation @ Vector((0.0, 1.0, 0.0))
-        for name in ("CTRL_Eye_Gaze_L", "CTRL_Eye_Gaze_R"):
-            control = self.controls[name]
-            matrix = control.matrix_world.copy()
-            matrix.translation += camera_right * (0.18 * screen_x)
-            matrix.translation += camera_up * (0.16 * screen_up)
-            control.matrix_world = matrix
+        for object_ in self.eye_surfaces.values():
+            matrix = object_.matrix_world.copy()
+            matrix.translation += camera_right * (0.075 * screen_x)
+            matrix.translation += camera_up * (0.075 * screen_up)
+            object_.matrix_world = matrix
 
         left_ear = self.controls["CTRL_Ear_L"]
         right_ear = self.controls["CTRL_Ear_R"]

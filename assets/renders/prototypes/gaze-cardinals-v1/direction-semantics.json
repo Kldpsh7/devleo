@@ -1,5 +1,8 @@
 {
-  "ok": true,
+  "ok": false,
+  "status": "superseded-after-blind-review",
+  "labeled_review_ok": true,
+  "blind_followup_ok": false,
   "directions": {
     "000": {
       "verdict": "pass",
@@ -27,6 +30,7 @@
     }
   },
   "review_warnings": [
-    "Horizontal pupil travel is subtle at 192x208, but accompanying head and muzzle yaw preserves direction readability."
+    "Horizontal pupil travel is subtle at 192x208, but accompanying head and muzzle yaw preserves direction readability.",
+    "Three isolated blind reviewers classified every horizontal and vertical pair as ambiguous, including both cardinal hard gates."
   ]
 }

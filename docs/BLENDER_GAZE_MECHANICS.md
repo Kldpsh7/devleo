@@ -20,7 +20,9 @@ fixed. The laptop never rotates with the gaze.
 ## Motion budget
 
 Each 22.5° step receives one-sixteenth of a periodic eye/head/ear arc. Eye travel is
-limited to the existing aperture. Head yaw peaks at 30°, pitch peaks at 20°, and ear
-follow-through peaks at 3°. No adjacent pair may introduce a new prop, expression,
-scale, baseline, or whole-sprite tilt. `337.5 -> 000` and `157.5 -> 180` use the same
-step size as every other boundary.
+limited to the existing aperture. The renderer compensates for the fixed camera's
+19.7° three-quarter yaw, then permits 46° of screen-axis yaw and 32° of pitch so the
+cardinals remain readable after the 192x208 export. Ear follow-through peaks at 3°.
+No adjacent pair may introduce a new prop, expression, scale, baseline, or
+whole-sprite tilt. `337.5 -> 000` and `157.5 -> 180` use the same step size as every
+other boundary.

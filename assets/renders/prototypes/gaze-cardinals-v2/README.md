@@ -1,8 +1,10 @@
-# Gaze cardinal candidate v1
+# Gaze cardinal candidate v2
 
-This snapshot records the first labeled cardinal review. It was superseded by v2
-after three blind reviewers found every normal-size A/B direction pair ambiguous.
-It must not be used for runtime art.
+This snapshot freezes the repaired four-cardinal family after the v1 blind-review
+failure. It is a visual gate, not runtime-approved art.
+
+V2 adds camera-compensated head turns and direct whole-iris/pupil surface travel so
+the axes remain unmistakable after the 192x208 export.
 
 - `directions/`: full-resolution transparent `000`, `090`, `180`, and `270` masters.
 - `gaze-directions.png`: neutral-plus-cardinals review sheet.

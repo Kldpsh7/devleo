@@ -1,0 +1,31 @@
+{
+  "ok": true,
+  "status": "approved-for-full-loop-synthesis",
+  "directions": {
+    "000": {
+      "verdict": "pass",
+      "expected": "up",
+      "observed": "up",
+      "reason": "Raised irises, lower globe exposure, and upward head pitch."
+    },
+    "090": {
+      "verdict": "pass",
+      "expected": "screen-right",
+      "observed": "screen-right",
+      "reason": "Irises shift screen-right with matching nose, muzzle, and cheek yaw."
+    },
+    "180": {
+      "verdict": "pass",
+      "expected": "down",
+      "observed": "down",
+      "reason": "Lowered irises, upper globe exposure, and downward head pitch."
+    },
+    "270": {
+      "verdict": "pass",
+      "expected": "screen-left",
+      "observed": "screen-left",
+      "reason": "Irises shift screen-left with opposing nose, muzzle, and cheek yaw."
+    }
+  },
+  "review_warnings": []
+}
