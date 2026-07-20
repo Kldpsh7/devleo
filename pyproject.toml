@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT AND CC-BY-4.0"
 license-files = ["LICENSE", "LICENSE-ASSETS.md"]
-authors = [{name = "Lion Cub Pet contributors"}]
+authors = [{name = "Kuldeep Sharma"}]
 keywords = ["desktop-pet", "lion", "pyside6", "productivity", "mascot"]
 classifiers = [
   "Development Status :: 3 - Alpha",
