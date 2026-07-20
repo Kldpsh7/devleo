@@ -40,14 +40,14 @@ MIN_OPACITY = 0.25
 MAX_OPACITY = 1.0
 FRAME_COUNTS = {0: 6, 1: 8, 2: 8, 3: 4, 4: 5, 5: 8, 6: 6, 7: 6, 8: 6, 9: 8, 10: 8}
 CUSTOM_FRAME_COUNTS = {"relax": 8, "focus": 8, "sleep": 8, "motivate": 8, "advice": 8}
-# The approved v2 atlas is authoritative for standard states. Legacy smooth
-# overrides remain packaged only for historical compatibility and are not loaded.
-SMOOTH_FRAME_COUNTS: dict[str, int] = {}
+# The approved v2 atlas remains authoritative for stationary states. Directional
+# roaming uses isolated higher-frame-count sequences to avoid atlas-slot bleed.
+SMOOTH_FRAME_COUNTS = {"walk-right": 16, "walk-left": 16}
 FRAME_INTERVALS = {
     "idle": 230,
     "walk": 130,
-    "walk-right": 130,
-    "walk-left": 130,
+    "walk-right": 85,
+    "walk-left": 85,
     "wave": 180,
     "jump": 160,
     "failure": 190,

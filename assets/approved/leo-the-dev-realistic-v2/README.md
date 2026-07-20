@@ -9,8 +9,10 @@ Approved production graphics for the photorealistic young lion-cub identity.
 - Gaze: 16 clockwise directions with independently approved cardinals.
 - Deterministic gates: one blue-key edge despill, v2 atlas validation, row
   registration, blind direction consensus, continuity review, and final visual QA.
-- Directional pounce rows use deterministic slots extraction so left is the exact
-  framewise mirror of right without reordering or cadence drift.
+- Directional pounce rows use isolated component extraction so no neighboring
+  pose fragments survive. Left remains the exact framewise mirror of right.
+- The desktop runtime adds eight generated midpoint poses to those eight clean
+  keyframes, producing separate 16-frame right/left loops at 85 ms per frame.
 - Accepted warnings: intermediate directions 135 and 157.5 have subtle
   screen-right cues; 337.5 has a subtle upward cue. All hard cardinals pass.
 

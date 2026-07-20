@@ -1,6 +1,6 @@
 visual_qa=pass
-qa_note=The corrected 11-row release is visually coherent and complete, with rows 1 and 2 now cleanly framewise mirrored via the deliberate slots extraction and no visible regressions.
+qa_note=The corrected 11-row release is visually coherent and complete; rows 1 and 2 use isolated components, are fragment-free, and remain exact framewise mirrors with no visible regressions.
 direction_semantics=000 pass clear up gaze;022.5 pass readable up-right turn;045 pass clear up-right yaw;067.5 pass clear up-right yaw;090 pass unmistakable screen-right profile;112.5 pass readable down-right turn;135 warning clearly down with weak screen-right bias;157.5 warning down-right with weak horizontal cue;180 pass unmistakable down gaze;202.5 pass readable down-left turn;225 pass clear down-left yaw;247.5 pass clear down-left yaw;270 pass unmistakable screen-left profile;292.5 pass readable up-left turn;315 pass clear up-left yaw;337.5 warning readable up-left with weak upward cue
-review_warnings=rows 1 and 2 intentionally use slots extraction to preserve exact framewise mirroring and visually pass;135 and 157.5 retain accepted weak rightward intermediate cues;337.5 retains an accepted weak upward cue;blind intermediate-axis and continuity metric warnings show no visible reversal, snap, hole, or identity drift
+review_warnings=135 and 157.5 retain accepted weak rightward intermediate cues;337.5 retains an accepted weak upward cue;blind intermediate-axis and continuity metric warnings show no visible reversal, snap, hole, or identity drift
 repair_rows=none
 repair_notes=none

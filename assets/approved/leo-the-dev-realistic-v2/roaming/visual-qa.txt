@@ -1,0 +1,4 @@
+visual_qa=pass
+qa_note=Both 16-frame loops are smooth, stable, correctly directed and mirrored, with clean loop closure; both 8-frame compatibility rows are fragment-free.
+repair_frames=none
+repair_notes=none
