@@ -198,8 +198,7 @@ class PetWindow(QWidget):
         self.debug_label.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         self.debug_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
         self.debug_label.setStyleSheet(
-            "background: rgba(0, 0, 0, 180); color: #8fffa0; padding: 3px; "
-            "font: 9px monospace;"
+            "background: rgba(0, 0, 0, 180); color: #8fffa0; padding: 3px; font: 9px monospace;"
         )
         self.debug_label.setWordWrap(False)
         self.debug_label.setVisible(False)
@@ -850,9 +849,7 @@ class PetWindow(QWidget):
         min_x, max_x, min_y, max_y = self.roaming_position_limits()
 
         def choose_axis(current: int, minimum: int, maximum: int) -> int:
-            minimum_travel = min(
-                round(MIN_INWARD_TRAVEL * self.config.scale), maximum - minimum
-            )
+            minimum_travel = min(round(MIN_INWARD_TRAVEL * self.config.scale), maximum - minimum)
             if current <= minimum + ROAM_EDGE_MARGIN:
                 return random.randint(min(maximum, current + minimum_travel), maximum)
             if current >= maximum - ROAM_EDGE_MARGIN:
@@ -866,9 +863,7 @@ class PetWindow(QWidget):
                 return False
             if self.y() <= min_y + ROAM_EDGE_MARGIN and candidate.y() <= self.y():
                 return False
-            return not (
-                self.y() >= max_y - ROAM_EDGE_MARGIN and candidate.y() >= self.y()
-            )
+            return not (self.y() >= max_y - ROAM_EDGE_MARGIN and candidate.y() >= self.y())
 
         cursor = cursor_position() if self.config.avoid_cursor else None
         minimum_distance = MIN_ROAM_TRAVEL * self.config.scale
@@ -889,8 +884,7 @@ class PetWindow(QWidget):
                 and distance >= minimum_distance
                 and abs(dx) / max(distance, 1.0) >= MIN_HORIZONTAL_TRAVEL_RATIO
                 and (
-                    cursor is None
-                    or self.distance_from_cursor(candidate, cursor) >= cursor_radius
+                    cursor is None or self.distance_from_cursor(candidate, cursor) >= cursor_radius
                 )
             )
 
