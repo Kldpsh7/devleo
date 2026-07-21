@@ -2,7 +2,7 @@
 
 All notable changes will be recorded here. The project follows Semantic Versioning after its first public release.
 
-## 0.1.0 - Unreleased
+## 0.1.0 - 2026-07-21
 
 - Added cross-platform PySide6 transparent overlay runtime.
 - Added terminal lifecycle, movement, appearance, animation, configuration, diagnostic, and autostart controls.

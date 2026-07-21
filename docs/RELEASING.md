@@ -4,7 +4,7 @@
 
 Software is licensed under MIT and original visual assets under CC BY 4.0. Both notices are included in release archives through PEP 639 package metadata.
 
-1. Create the public GitHub repository and replace every `<OWNER>` placeholder in `README.md`.
+1. Confirm the public GitHub repository is `Kldpsh7/devleo` and README install URLs resolve.
 2. Create a protected GitHub environment named `pypi`; require an approver for production releases.
 3. In PyPI, create a pending Trusted Publisher for package `lion-cub-pet` using the GitHub owner, repository name, workflow `release.yml`, and environment `pypi`.
 4. Confirm the repository version, release tag, and changelog all match.
@@ -53,7 +53,7 @@ LEO_AUTOSTART=0 sh install.sh
 Unpublished Git source:
 
 ```bash
-LEO_AUTOSTART=0 LEO_PACKAGE_SPEC="git+https://github.com/<OWNER>/lion-cub-pet" sh install.sh
+LEO_AUTOSTART=0 LEO_PACKAGE_SPEC="git+https://github.com/Kldpsh7/devleo.git" sh install.sh
 ```
 
 PowerShell uses the same `LEO_AUTOSTART` and `LEO_PACKAGE_SPEC` environment variables with `install.ps1`.

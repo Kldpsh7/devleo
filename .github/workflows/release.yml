@@ -11,11 +11,17 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
+      - name: Verify release tag matches project version
+        run: >-
+          python -c "import os, tomllib; from pathlib import Path;
+          version=tomllib.loads(Path('pyproject.toml').read_text())['project']['version'];
+          expected=f'v{version}'; actual=os.environ['GITHUB_REF_NAME'];
+          assert actual==expected, f'release tag {actual!r} does not match {expected!r}'"
       - run: python -m pip install --upgrade build twine
       - run: python -m build
       - run: python -m twine check dist/*
@@ -26,11 +32,11 @@ jobs:
           Path('release').mkdir(exist_ok=True);
           Path('release/SHA256SUMS').write_text(''.join(
           f'{sha256(p.read_bytes()).hexdigest()}  {p.name}\n' for p in artifacts))"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: python-package-distributions
           path: dist/
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release-checksums
           path: release/SHA256SUMS
@@ -42,7 +48,7 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: python-package-distributions
           path: dist
@@ -54,11 +60,11 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: python-package-distributions
           path: dist
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: release-checksums
           path: release

@@ -90,22 +90,22 @@ The default `full-screen` bounds let visible pet pixels reach all four physical 
 
 The terminal installer uses `uv` to create an isolated user-level tool environment. It installs `uv` first when needed, then installs Leo, enables user-level autostart, and starts the GUI.
 
-After the public GitHub repository exists, macOS and Linux use one command (replace `<OWNER>` once):
+macOS and Linux use one command:
 
 ```bash
-curl -LsSf https://raw.githubusercontent.com/<OWNER>/lion-cub-pet/main/install.sh | sh
+curl -LsSf https://raw.githubusercontent.com/Kldpsh7/devleo/main/install.sh | sh
 ```
 
 Windows PowerShell:
 
 ```powershell
-irm https://raw.githubusercontent.com/<OWNER>/lion-cub-pet/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/Kldpsh7/devleo/main/install.ps1 | iex
 ```
 
 Before the PyPI release, point the same installer at the Git repository:
 
 ```bash
-LEO_PACKAGE_SPEC="git+https://github.com/<OWNER>/lion-cub-pet" sh install.sh
+LEO_PACKAGE_SPEC="git+https://github.com/Kldpsh7/devleo.git" sh install.sh
 ```
 
 After the PyPI release, direct Python installation also works:
