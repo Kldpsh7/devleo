@@ -2,7 +2,7 @@
 
 All notable changes will be recorded here. The project follows Semantic Versioning after its first public release.
 
-## Unreleased
+## 0.1.1 - 2026-07-21
 
 - Made roaming targets screen-edge-aware across every Leo size and walking frame.
 - Added directional pitch for upward and downward roaming.
