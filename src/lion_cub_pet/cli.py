@@ -139,7 +139,14 @@ def parser() -> argparse.ArgumentParser:
     opacity.add_argument("value", type=float)
     transparency = commands.add_parser("transparency")
     transparency.add_argument("value", type=float, help="percentage transparent, from 0 to 75")
-    for name in ["always-on-top", "click-through", "avoid-cursor", "dialogues", "advice"]:
+    for name in [
+        "always-on-top",
+        "click-through",
+        "avoid-cursor",
+        "debug-movement",
+        "dialogues",
+        "advice",
+    ]:
         add_value_command(commands, name, ["on", "off"])
     add_value_command(commands, "personality", ["playful"])
     add_value_command(commands, "mode", ["normal", "relax", "focus", "sleep", "motivate"])
@@ -273,6 +280,7 @@ def completion(shell: str) -> str:
         "run-chance",
         "snap-distance",
         "avoid-cursor",
+        "debug-movement",
         "play",
         "look",
         "laptop",
@@ -401,6 +409,7 @@ def run(args: argparse.Namespace) -> Any:  # noqa: C901, PLR0911
         "run-chance",
         "snap-distance",
         "avoid-cursor",
+        "debug-movement",
         "laptop",
     }:
         key = command.replace("-", "_")
@@ -418,7 +427,14 @@ def run(args: argparse.Namespace) -> Any:  # noqa: C901, PLR0911
         elif command == "transparency":
             value = 1.0 - min(max(float(value), 0.0), 75.0) / 100.0
             key = "opacity"
-        elif command in {"always-on-top", "click-through", "avoid-cursor", "dialogues", "advice"}:
+        elif command in {
+            "always-on-top",
+            "click-through",
+            "avoid-cursor",
+            "debug-movement",
+            "dialogues",
+            "advice",
+        }:
             value = value == "on"
         elif command in {"idle-delay", "opacity"}:
             value = float(value)

@@ -1,3 +1,5 @@
+import math
+
 from PySide6.QtCore import QEvent, QObject, QPoint, QPointF, QRect, Qt
 from PySide6.QtGui import QContextMenuEvent, QMouseEvent
 from PySide6.QtWidgets import QApplication, QMenu, QSystemTrayIcon
@@ -119,6 +121,176 @@ def test_auto_roaming_can_leave_idle(monkeypatch: object) -> None:
     window.close()
 
 
+def test_roaming_chooses_inward_targets_at_screen_edges(monkeypatch: object) -> None:
+    window = make_window(monkeypatch, PetConfig(movement="roam", animation="auto"))
+    min_x, max_x, min_y, _max_y = window.roaming_position_limits()
+    monkeypatch.setattr(runtime.random, "randint", lambda low, _high: low)
+
+    window.move(min_x, min_y)
+    window.choose_target()
+    assert window.target is not None
+    assert window.target.x() > window.x()
+    assert window.target.y() > window.y()
+
+    _min_x, _max_x, _min_y, max_y = window.roaming_position_limits()
+    window.move(max_x, max_y)
+    window.choose_target()
+    assert window.target is not None
+    assert window.target.x() < window.x()
+    assert window.target.y() < window.y()
+    window.close()
+
+
+def test_roaming_replans_an_unreachable_edge_target(monkeypatch: object) -> None:
+    window = make_window(
+        monkeypatch,
+        PetConfig(movement="roam", animation="auto", x=0, y=0),
+    )
+    min_x, _max_x, min_y, _max_y = window.roaming_position_limits()
+    window.move(min_x, min_y)
+    window.target = QPoint(min_x - 100, min_y)
+    monkeypatch.setattr(runtime.random, "randint", lambda low, _high: low)
+
+    window.move_tick()
+
+    assert window.target is not None
+    assert window.target.x() > window.x()
+    window.close()
+
+
+def test_roaming_tilts_for_upward_and_downward_travel(monkeypatch: object) -> None:
+    window = make_window(
+        monkeypatch,
+        PetConfig(movement="roam", animation="auto", x=0, y=0),
+    )
+    min_x, max_x, min_y, max_y = window.roaming_position_limits()
+    window.move((min_x + max_x) // 2, (min_y + max_y) // 2)
+    window.target = window.pos() + QPoint(100, -100)
+    window.move_tick()
+    assert -runtime.MAX_ROAM_TILT_DEGREES <= window.movement_tilt_degrees < 0
+
+    window.target = window.pos() + QPoint(-100, -100)
+    window.move_tick()
+    assert 0 < window.movement_tilt_degrees <= runtime.MAX_ROAM_TILT_DEGREES
+
+    window.target = window.pos() + QPoint(100, 100)
+    window.move_tick()
+    assert 0 < window.movement_tilt_degrees <= runtime.MAX_ROAM_TILT_DEGREES
+
+    window.target = window.pos() + QPoint(-100, 100)
+    window.move_tick()
+    assert -runtime.MAX_ROAM_TILT_DEGREES <= window.movement_tilt_degrees < 0
+    window.close()
+
+
+def test_target_planner_rejects_short_and_nearly_vertical_trips(monkeypatch: object) -> None:
+    screen = FakeScreen(QRect(0, 0, 800, 600))
+    monkeypatch.setattr(runtime, "application_screens", lambda: [screen])
+    window = make_window(
+        monkeypatch,
+        PetConfig(movement="roam", animation="auto", x=300, y=200),
+    )
+    monkeypatch.setattr(runtime.random, "randint", lambda low, high: (low + high) // 2)
+
+    window.choose_target()
+
+    assert window.target is not None
+    dx = window.target.x() - window.x()
+    dy = window.target.y() - window.y()
+    distance = math.hypot(dx, dy)
+    assert distance >= runtime.MIN_ROAM_TRAVEL * window.config.scale
+    assert abs(dx) / distance >= runtime.MIN_HORIZONTAL_TRAVEL_RATIO
+    window.close()
+
+
+def test_cursor_avoidance_replans_away_from_nearby_cursor(monkeypatch: object) -> None:
+    screen = FakeScreen(QRect(0, 0, 800, 600))
+    monkeypatch.setattr(runtime, "application_screens", lambda: [screen])
+    window = make_window(
+        monkeypatch,
+        PetConfig(
+            movement="roam",
+            animation="auto",
+            avoid_cursor=True,
+            x=300,
+            y=200,
+        ),
+    )
+    cursor = window.pet_center_at(window.pos())
+    monkeypatch.setattr(runtime, "cursor_position", lambda: cursor)
+    monkeypatch.setattr(runtime.random, "randint", lambda _low, high: high)
+    monkeypatch.setattr(runtime.random, "random", lambda: 1.0)
+    window.target = window.pos() + QPoint(80, 0)
+
+    window.move_tick()
+
+    assert window.target is not None
+    assert window.distance_from_cursor(window.target, cursor) >= (
+        runtime.CURSOR_AVOIDANCE_RADIUS * window.config.scale
+    )
+    window.close()
+
+
+def test_run_chance_changes_roaming_gait_speed_and_cadence(monkeypatch: object) -> None:
+    window = make_window(
+        monkeypatch,
+        PetConfig(movement="roam", animation="auto", run_chance=100, x=0, y=0),
+    )
+    monkeypatch.setattr(runtime.random, "random", lambda: 0.0)
+    window.choose_target()
+    assert window.roaming_run
+    assert window.animation_interval("walk-right") == round(
+        runtime.FRAME_INTERVALS["walk-right"] * runtime.RUN_FRAME_INTERVAL_FACTOR
+    )
+
+    window.config.run_chance = 0
+    window.choose_target()
+    assert not window.roaming_run
+    assert window.animation_interval("walk-right") == runtime.FRAME_INTERVALS["walk-right"]
+    window.close()
+
+
+def test_roaming_speed_eases_at_start_and_destination(monkeypatch: object) -> None:
+    window = make_window(
+        monkeypatch,
+        PetConfig(movement="roam", animation="auto", x=100, y=100),
+    )
+    window.roam_leg_start = QPointF(window.pos())
+    window.target = window.pos() + QPoint(300, 0)
+
+    start = window.roam_easing_factor(300)
+    middle = window.roam_easing_factor(150)
+    finish = window.roam_easing_factor(1)
+
+    assert start == runtime.MIN_ROAM_SPEED_FACTOR
+    assert middle == 1.0
+    assert runtime.MIN_ROAM_SPEED_FACTOR < finish < middle
+    window.close()
+
+
+def test_movement_debug_overlay_and_status(monkeypatch: object) -> None:
+    window = make_window(
+        monkeypatch,
+        PetConfig(movement="roam", animation="auto", x=100, y=100),
+    )
+    window.target = window.pos() + QPoint(200, 80)
+
+    response = window.handle({"action": "set", "key": "debug_movement", "value": True})
+
+    assert not window.debug_label.isHidden()
+    assert window.debug_label.testAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+    assert "B " in window.debug_label.text()
+    assert "T " in window.debug_label.text()
+    debug = response["runtime"]["movement_debug"]
+    assert debug["enabled"] is True
+    assert debug["target"] == [window.target.x(), window.target.y()]
+    assert debug["direction"] == "down-right"
+
+    window.handle({"action": "set", "key": "debug_movement", "value": False})
+    assert window.debug_label.isHidden()
+    window.close()
+
+
 def test_roam_clears_manual_stationary_animation(monkeypatch: object) -> None:
     window = make_window(monkeypatch, PetConfig(movement="stay", animation="working"))
     window.handle({"action": "roam"})
@@ -182,6 +354,58 @@ def test_size_is_clamped_to_safe_range(monkeypatch: object) -> None:
     assert window.config.scale == runtime.MAX_SCALE
     window.handle({"action": "set", "key": "scale", "value": 0.1})
     assert window.config.scale == runtime.MIN_SCALE
+    window.close()
+
+
+def test_size_change_refreshes_roaming_edges_and_target(monkeypatch: object) -> None:
+    screen = FakeScreen(QRect(0, 0, 800, 600))
+    monkeypatch.setattr(runtime, "application_screens", lambda: [screen])
+    window = make_window(
+        monkeypatch,
+        PetConfig(
+            movement="roam",
+            animation="auto",
+            scale=runtime.MIN_SCALE,
+            x=0,
+            y=0,
+        ),
+    )
+    _small_min_x, small_max_x, _small_min_y, small_max_y = window.roaming_position_limits()
+    window.move(small_max_x, small_max_y)
+    window.target = QPoint(small_max_x, small_max_y)
+
+    window.handle({"action": "set", "key": "scale", "value": runtime.MAX_SCALE})
+
+    min_x, max_x, min_y, max_y = window.roaming_position_limits()
+    assert max_x < small_max_x
+    assert max_y < small_max_y
+    assert min_x <= window.x() <= max_x
+    assert min_y <= window.y() <= max_y
+    assert window.target is None
+    window.close()
+
+
+def test_screen_geometry_change_refreshes_roaming_edges(monkeypatch: object) -> None:
+    screen = FakeScreen(QRect(0, 0, 1000, 700))
+    monkeypatch.setattr(runtime, "application_screens", lambda: [screen])
+    window = make_window(
+        monkeypatch,
+        PetConfig(movement="roam", animation="auto", x=0, y=0),
+    )
+    _min_x, old_max_x, _min_y, old_max_y = window.roaming_position_limits()
+    window.move(old_max_x, old_max_y)
+    window.target = QPoint(old_max_x, old_max_y)
+
+    screen._geometry = QRect(0, 0, 640, 480)
+    screen._available = screen._geometry
+    window.screen_geometry_changed()
+
+    min_x, max_x, min_y, max_y = window.roaming_position_limits()
+    assert max_x < old_max_x
+    assert max_y < old_max_y
+    assert min_x <= window.x() <= max_x
+    assert min_y <= window.y() <= max_y
+    assert window.target is None
     window.close()
 
 
