@@ -41,9 +41,7 @@ def clear_scene() -> None:
 
 def world_bounds(objects: list[bpy.types.Object]) -> tuple[Vector, Vector]:
     corners = [
-        object_.matrix_world @ Vector(corner)
-        for object_ in objects
-        for corner in object_.bound_box
+        object_.matrix_world @ Vector(corner) for object_ in objects for corner in object_.bound_box
     ]
     minimum = Vector(tuple(min(corner[axis] for corner in corners) for axis in range(3)))
     maximum = Vector(tuple(max(corner[axis] for corner in corners) for axis in range(3)))

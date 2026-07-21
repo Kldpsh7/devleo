@@ -39,18 +39,10 @@ FAMILIES = {
     "waiting": FamilySpec("core-animations/animations/waiting", 12, 210, True),
     "working": FamilySpec("core-animations/animations/working", 16, 145, True),
     "review": FamilySpec("core-animations/animations/review", 12, 210, True),
-    "idle-to-walk-right": FamilySpec(
-        "transitions/animations/idle-to-walk-right", 20, 70, False
-    ),
-    "walk-right-to-idle": FamilySpec(
-        "transitions/animations/walk-right-to-idle", 20, 70, False
-    ),
-    "idle-to-walk-left": FamilySpec(
-        "transitions/animations/idle-to-walk-left", 20, 70, False
-    ),
-    "walk-left-to-idle": FamilySpec(
-        "transitions/animations/walk-left-to-idle", 20, 70, False
-    ),
+    "idle-to-walk-right": FamilySpec("transitions/animations/idle-to-walk-right", 20, 70, False),
+    "walk-right-to-idle": FamilySpec("transitions/animations/walk-right-to-idle", 20, 70, False),
+    "idle-to-walk-left": FamilySpec("transitions/animations/idle-to-walk-left", 20, 70, False),
+    "walk-left-to-idle": FamilySpec("transitions/animations/walk-left-to-idle", 20, 70, False),
     "gaze": FamilySpec("gaze-directions/directions", 16, 200, False),
 }
 
@@ -184,16 +176,10 @@ def main() -> None:
         for family_name, paths in sources.items():
             family_entries: list[dict[str, object]] = []
             for index, path in enumerate(paths):
-                image = resize_master(
-                    shift_image(load_rgba(path), shifts[family_name]), density
-                )
+                image = resize_master(shift_image(load_rgba(path), shifts[family_name]), density)
                 processed[(family_name, density, index)] = image
                 frame_path = (
-                    output_dir
-                    / "frames"
-                    / density_name
-                    / family_name
-                    / f"{index:02d}.webp"
+                    output_dir / "frames" / density_name / family_name / f"{index:02d}.webp"
                 )
                 save_lossless_webp(image, frame_path)
                 family_entries.append(
@@ -233,9 +219,7 @@ def main() -> None:
         save_lossless_webp(clear_hidden_rgb(atlas), atlas_path)
         if density_name == "1x":
             png_path = atlas_dir / "spritesheet.png"
-            clear_hidden_rgb(atlas).save(
-                png_path, format="PNG", compress_level=9, optimize=False
-            )
+            clear_hidden_rgb(atlas).save(png_path, format="PNG", compress_level=9, optimize=False)
         density_entries[density_name] = {
             "density": density,
             "cell_size": list(cell_size),

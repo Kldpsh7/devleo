@@ -45,9 +45,7 @@ def compose(image: Image.Image) -> Image.Image:
     return background.convert("RGB")
 
 
-def preview_gif(
-    images: list[Image.Image], duration: int, loop: bool, destination: Path
-) -> None:
+def preview_gif(images: list[Image.Image], duration: int, loop: bool, destination: Path) -> None:
     frames = [compose(image) for image in images]
     frames[0].save(
         destination,
@@ -69,20 +67,12 @@ def main() -> None:
     qa_dir = export_dir / "qa"
     preview_dir = qa_dir / "previews"
     preview_dir.mkdir(parents=True, exist_ok=True)
-    official_validation = json.loads(
-        (qa_dir / "validation-v2.json").read_text(encoding="utf-8")
-    )
-    despill = json.loads(
-        (qa_dir / "chroma-despill-extended.json").read_text(encoding="utf-8")
-    )
-    continuity = json.loads(
-        (qa_dir / "look-continuity.json").read_text(encoding="utf-8")
-    )
+    official_validation = json.loads((qa_dir / "validation-v2.json").read_text(encoding="utf-8"))
+    despill = json.loads((qa_dir / "chroma-despill-extended.json").read_text(encoding="utf-8"))
+    continuity = json.loads((qa_dir / "look-continuity.json").read_text(encoding="utf-8"))
 
     overall_ok = (
-        official_validation["ok"] is True
-        and despill["ok"] is True
-        and continuity["ok"] is True
+        official_validation["ok"] is True and despill["ok"] is True and continuity["ok"] is True
     )
     density_qa: dict[str, Any] = {}
     for density_name, density_entry in manifest["densities"].items():
@@ -93,11 +83,7 @@ def main() -> None:
         expected_atlas_size = (ATLAS_COLUMNS * cell_width, ATLAS_ROWS * cell_height)
         checksum_matches = checksum(atlas_path) == density_entry["atlas_sha256"]
         atlas_hidden_rgb = hidden_rgb_count(atlas)
-        atlas_ok = (
-            atlas.size == expected_atlas_size
-            and checksum_matches
-            and atlas_hidden_rgb == 0
-        )
+        atlas_ok = atlas.size == expected_atlas_size and checksum_matches and atlas_hidden_rgb == 0
 
         cells: list[dict[str, object]] = []
         for row in range(ATLAS_ROWS):

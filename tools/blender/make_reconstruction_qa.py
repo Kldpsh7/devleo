@@ -63,9 +63,7 @@ def main() -> None:
     panel = (384, 416)
     label_height = 24
     background = (27, 30, 36)
-    contact = Image.new(
-        "RGB", (panel[0] * 4, (panel[1] + label_height) * 2), background
-    )
+    contact = Image.new("RGB", (panel[0] * 4, (panel[1] + label_height) * 2), background)
     draw = ImageDraw.Draw(contact)
     font = ImageFont.load_default()
     for index, (view, frame) in enumerate(zip(manifest["views"], frames, strict=True)):

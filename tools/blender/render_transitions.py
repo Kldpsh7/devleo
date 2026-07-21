@@ -105,15 +105,11 @@ class TransitionPose:
             target_pose = target[name]
             object_.location = tuple(
                 start + (end - start) * amount
-                for start, end in zip(
-                    source_pose["location"], target_pose["location"], strict=True
-                )
+                for start, end in zip(source_pose["location"], target_pose["location"], strict=True)
             )
             object_.rotation_euler = tuple(
                 angle_lerp(start, end, amount)
-                for start, end in zip(
-                    source_pose["rotation"], target_pose["rotation"], strict=True
-                )
+                for start, end in zip(source_pose["rotation"], target_pose["rotation"], strict=True)
             )
             object_.scale = tuple(
                 start + (end - start) * amount
@@ -128,17 +124,9 @@ class TransitionPose:
         center = source["center"].lerp(target["center"], amount)
         outward_sign = -1.0 if direction == "right" else 1.0
         outward_distance = 0.30 if direction == "right" else 0.46
-        center += (
-            self.camera_right
-            * outward_sign
-            * outward_distance
-            * math.sin(math.pi * phase)
-        )
+        center += self.camera_right * outward_sign * outward_distance * math.sin(math.pi * phase)
         scaled_local_center = Vector(
-            tuple(
-                coordinate * scale[index]
-                for index, coordinate in enumerate(LAPTOP_CENTER_LOCAL)
-            )
+            tuple(coordinate * scale[index] for index, coordinate in enumerate(LAPTOP_CENTER_LOCAL))
         )
         carrier_location = center - rotation @ scaled_local_center
         self.leo.laptop.matrix_world = Matrix.LocRotScale(carrier_location, rotation, scale)
@@ -151,11 +139,7 @@ class TransitionPose:
         paw = self.leo.parts[f"Front_Paw_{side}"]
         matrices = {object_: object_.matrix_world.copy() for object_ in (upper, lower, paw)}
         inner_sign = 1.0 if direction == "right" else -1.0
-        contact = (
-            laptop_center
-            - self.camera_up * 0.25
-            + self.camera_right * inner_sign * 0.13
-        )
+        contact = laptop_center - self.camera_up * 0.25 + self.camera_right * inner_sign * 0.13
         grip = math.sin(math.pi * phase) ** 0.82
         delta = contact - matrices[paw].translation
         for object_, influence in ((upper, 0.18), (lower, 0.52), (paw, 0.92)):
@@ -177,9 +161,7 @@ class TransitionPose:
             self.leo.head.location.y -= 0.07 * anticipation
             self.leo.head.rotation_euler.x += math.radians(4.0 * anticipation)
             tail_direction = -1.0 if direction == "right" else 1.0
-            self.leo.tail.rotation_euler.z += math.radians(
-                tail_direction * 7.0 * anticipation
-            )
+            self.leo.tail.rotation_euler.z += math.radians(tail_direction * 7.0 * anticipation)
             bpy.context.view_layer.update()
             self.place_carrying_leg(direction, laptop_center, phase)
         bpy.context.view_layer.update()
@@ -245,8 +227,7 @@ def main() -> None:
         rendered_frames[reverse_name] = reverse_frames
 
     animation_entries = [
-        {**animation, "frames": rendered_frames[animation["name"]]}
-        for animation in ANIMATIONS
+        {**animation, "frames": rendered_frames[animation["name"]]} for animation in ANIMATIONS
     ]
     source = Path(bpy.data.filepath).resolve()
     repository_root = Path(__file__).resolve().parents[2]

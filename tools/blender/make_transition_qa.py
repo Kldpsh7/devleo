@@ -141,8 +141,7 @@ def main() -> None:
         ]
         areas = [(box[2] - box[0]) * (box[3] - box[1]) for box in alpha_bboxes]
         adjacent_area_ratios = [
-            max(start, end) / min(start, end)
-            for start, end in zip(areas, areas[1:], strict=False)
+            max(start, end) / min(start, end) for start, end in zip(areas, areas[1:], strict=False)
         ]
         safety_edge = any(
             box[0] <= 8 or box[1] <= 8 or box[2] >= 1144 or box[3] >= 1240 for box in alpha_bboxes
@@ -166,9 +165,7 @@ def main() -> None:
         contact_sheet(images, name, render_dir / sheet_name)
         preview_gif(images, expected_duration, render_dir / preview_name)
         if name.startswith("idle-to"):
-            review_frames.extend(
-                ((f"{name}-09", images[9]), (f"{name}-19", images[-1]))
-            )
+            review_frames.extend(((f"{name}-09", images[9]), (f"{name}-19", images[-1])))
         qa_animations[name] = {
             "ok": animation_ok,
             "frame_count": expected_count,

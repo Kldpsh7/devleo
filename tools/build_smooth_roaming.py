@@ -108,9 +108,7 @@ def split(args: argparse.Namespace) -> None:
     left_frames: list[Image.Image] = []
     frame_reports: list[dict[str, object]] = []
     for index in range(OUTPUT_FRAME_COUNT):
-        frame = clear_hidden_rgb(
-            strip.crop((index * CELL[0], 0, (index + 1) * CELL[0], CELL[1]))
-        )
+        frame = clear_hidden_rgb(strip.crop((index * CELL[0], 0, (index + 1) * CELL[0], CELL[1])))
         edge_pixels = alpha_edge_pixels(frame)
         if edge_pixels:
             raise SystemExit(f"frame {index:02} touches a cell edge ({edge_pixels} pixels)")

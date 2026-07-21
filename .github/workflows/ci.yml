@@ -76,7 +76,7 @@ jobs:
           python -c "from importlib.metadata import distribution;
           dist=distribution('lion-cub-pet');
           assert dist.metadata['License-Expression']=='MIT AND CC-BY-4.0';
-          files={str(path).replace('\\', '/') for path in (dist.files or [])};
+          files={path.as_posix() for path in (dist.files or [])};
           assert any(path.endswith('/licenses/LICENSE') for path in files), files;
           assert any(path.endswith('/licenses/LICENSE-ASSETS.md') for path in files), files"
       - name: Verify packaged pet assets
