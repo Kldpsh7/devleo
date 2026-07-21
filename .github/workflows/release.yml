@@ -3,15 +3,26 @@ name: Release
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag to rebuild and attach assets for
+        required: true
+        type: string
 
 permissions:
   contents: read
+
+env:
+  RELEASE_TAG: ${{ inputs.tag || github.event.release.tag_name }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.RELEASE_TAG }}
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
@@ -20,7 +31,7 @@ jobs:
         run: >-
           python -c "import os, tomllib; from pathlib import Path;
           version=tomllib.loads(Path('pyproject.toml').read_text())['project']['version'];
-          expected=f'v{version}'; actual=os.environ['GITHUB_REF_NAME'];
+          expected=f'v{version}'; actual=os.environ['RELEASE_TAG'];
           assert actual==expected, f'release tag {actual!r} does not match {expected!r}'"
       - run: python -m pip install --upgrade build twine
       - run: python -m build
@@ -42,6 +53,7 @@ jobs:
           path: release/SHA256SUMS
 
   publish-pypi:
+    if: github.event_name == 'release'
     needs: build
     runs-on: ubuntu-latest
     environment: pypi
@@ -71,4 +83,5 @@ jobs:
       - name: Attach distributions and checksums
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "${GITHUB_REF_NAME}" dist/* release/SHA256SUMS --clobber
+          GH_REPO: ${{ github.repository }}
+        run: gh release upload "${RELEASE_TAG}" dist/* release/SHA256SUMS --clobber
