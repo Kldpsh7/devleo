@@ -8,6 +8,7 @@ import sys
 import time
 from ctypes import c_void_p
 from datetime import date, datetime, timedelta
+from importlib import import_module
 from importlib.resources import files
 from pathlib import Path
 from typing import Any
@@ -1098,18 +1099,26 @@ class PetWindow(QWidget):
         if sys.platform != "darwin":
             self.native_window_state = {"applied": True, "platform": sys.platform}
             return
+        qt_platform = QGuiApplication.platformName()
+        if qt_platform != "cocoa":
+            self.native_window_state = {
+                "applied": False,
+                "platform": "darwin",
+                "qt_platform": qt_platform,
+            }
+            return
         try:
-            import AppKit  # type: ignore[import-untyped]
-            import objc  # type: ignore[import-untyped]
+            appkit: Any = import_module("AppKit")
+            objc: Any = import_module("objc")
 
             view = objc.objc_object(c_void_p=c_void_p(int(self.winId())))
             window = view.window()
             if window is None:
                 raise RuntimeError("Qt native window is not available")
-            level = AppKit.NSFloatingWindowLevel if self.config.always_on_top else 0
+            level = appkit.NSFloatingWindowLevel if self.config.always_on_top else 0
             behavior = (
-                AppKit.NSWindowCollectionBehaviorCanJoinAllSpaces
-                | AppKit.NSWindowCollectionBehaviorFullScreenAuxiliary
+                appkit.NSWindowCollectionBehaviorCanJoinAllSpaces
+                | appkit.NSWindowCollectionBehaviorFullScreenAuxiliary
             )
             window.setLevel_(level)
             window.setCollectionBehavior_(behavior)
@@ -1161,13 +1170,15 @@ class PetApplication(QApplication):
     def apply_platform_application_icon(self) -> bool:
         if sys.platform != "darwin":
             return True
+        if QGuiApplication.platformName() != "cocoa":
+            return False
         try:
-            import AppKit
+            appkit: Any = import_module("AppKit")
 
-            image = AppKit.NSImage.alloc().initWithContentsOfFile_(str(self.icon_path))
+            image = appkit.NSImage.alloc().initWithContentsOfFile_(str(self.icon_path))
             if image is None:
                 raise RuntimeError(f"could not load application icon: {self.icon_path}")
-            AppKit.NSApplication.sharedApplication().setApplicationIconImage_(image)
+            appkit.NSApplication.sharedApplication().setApplicationIconImage_(image)
             return True
         except Exception:  # noqa: BLE001
             logging.exception("failed to set native macOS application icon")
