@@ -56,7 +56,7 @@ Stationary seated states render at 85% of the selected movement size so the cub 
 
 Leo uses shuffled dialogue bags, so a line does not repeat until the current state’s alternatives have been used. Advice appears at a low random frequency and temporarily uses a smooth 8-frame water-offering animation at 280 ms/frame.
 
-The desktop runtime also uses independently validated 8-frame sequences for Idle (230 ms/frame), Wave (180 ms/frame), Jump (160 ms/frame), Waiting (230 ms/frame), Working (180 ms/frame), and Review (220 ms/frame) instead of stretching the fixed-count compatibility atlas rows. Whenever the laptop is open, its exterior lid faces the viewer while Leo sits behind and looks at the unseen screen. Waiting, Working, Review, and Focus use a dark rim, hinge seam, and paw emblem so the exterior lid remains readable at small scale.
+Directional roaming uses clean 16-frame right/left pounce sequences at 85 ms/frame. Each sprite is isolated inside its own `192 × 208` frame, and the left sequence is a framewise mirror of the right sequence without cadence reordering. Other standard states use the approved v2 atlas. Whenever the laptop is open, its exterior lid faces the viewer while Leo sits behind and looks at the unseen screen.
 
 ### Productivity and interaction systems
 
@@ -300,7 +300,8 @@ The same menu is available from the system tray and by right-clicking Leo:
 - A single animation state machine shared by all operating systems.
 - Local IPC so CLI commands control the running GUI process without spawning duplicates.
 
-See [Architecture](docs/ARCHITECTURE.md) and [Graphics quality](docs/GRAPHICS_QUALITY.md).
+See [Architecture](docs/ARCHITECTURE.md), [Graphics quality](docs/GRAPHICS_QUALITY.md),
+and the [Blender production pipeline](docs/BLENDER_PIPELINE.md).
 
 ## Repository layout
 
@@ -309,7 +310,9 @@ lion-cub-pet/
 ├── assets/
 │   ├── README.md
 │   ├── source/          # original high-resolution working art
+│   ├── source-3d/       # reproducible Blender source scenes
 │   ├── approved/        # reviewed master frames and metadata
+│   ├── renders/         # Blender work/approval boundaries
 │   └── runtime/         # deterministic runtime exports
 ├── docs/
 │   ├── ARCHITECTURE.md
@@ -322,7 +325,7 @@ lion-cub-pet/
 │   ├── platform/
 │   └── assets/
 ├── tests/
-├── scripts/
+├── tools/blender/       # headless scene, render, and QA pipeline
 ├── pyproject.toml
 └── README.md
 ```
@@ -335,6 +338,16 @@ For local development without `uv`:
 python3 -m venv .venv
 .venv/bin/python -m pip install -e ".[dev]"
 .venv/bin/lion-cub-pet install --start
+```
+
+Blender art pipeline:
+
+```bash
+.venv/bin/python -m pip install -e ".[dev,art]"
+tools/blender/render_idle.sh
+tools/blender/render_realistic_identity.sh
+tools/blender/render_realistic_topology.sh
+tools/blender/render_realistic_rig.sh
 ```
 
 Windows uses `.venv\Scripts\lion-cub-pet.exe`.

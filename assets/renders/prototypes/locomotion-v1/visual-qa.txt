@@ -1,0 +1,7 @@
+visual_qa=pass
+qa_note=All four locomotion loops preserve Leo's quadrupedal cub identity, anatomy, direction, secured laptop, clean edges, and coherent cadence at master and 192x208 scale.
+animation_verdicts=walk-right:pass calm right-facing four-beat gait with alternating grounded paws;walk-left:pass calm left-facing four-beat gait with connected tail and stable contact;run-right:pass right-facing compression, launch, seven-frame airborne bound, and smooth landing;run-left:pass left-facing compression, launch, seven-frame airborne bound, and smooth landing
+laptop_verdict=pass constant-size closed flank panel remains secured with stable geometry and no teleporting
+gait_evidence=walk:alternating fore/hind contacts across 12 frames with zero airborne frames and minimal baseline drift|run:frames 0-2 compress and launch, 3-9 keep all four paws airborne, and 10-11 descend into landing
+review_warnings=none
+repair_notes=none

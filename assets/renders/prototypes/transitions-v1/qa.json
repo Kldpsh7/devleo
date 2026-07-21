@@ -1,0 +1,597 @@
+{
+  "ok": true,
+  "animations": {
+    "idle-to-walk-right": {
+      "ok": true,
+      "frame_count": 20,
+      "frame_duration_ms": 70,
+      "loop": false,
+      "dimensions": [
+        1152,
+        1248
+      ],
+      "normal_cell_dimensions": [
+        192,
+        208
+      ],
+      "hidden_rgb_pixels_under_zero_alpha": 0,
+      "touches_safety_edge": false,
+      "unique_frame_hashes": 20,
+      "maximum_adjacent_center_step_px": 48.5,
+      "maximum_adjacent_baseline_step_px": 0,
+      "maximum_adjacent_bbox_area_ratio": 1.1192,
+      "alpha_bboxes": [
+        [
+          142,
+          48,
+          952,
+          1214
+        ],
+        [
+          131,
+          52,
+          950,
+          1214
+        ],
+        [
+          123,
+          68,
+          949,
+          1214
+        ],
+        [
+          121,
+          106,
+          948,
+          1214
+        ],
+        [
+          128,
+          124,
+          948,
+          1214
+        ],
+        [
+          148,
+          139,
+          947,
+          1214
+        ],
+        [
+          171,
+          167,
+          945,
+          1214
+        ],
+        [
+          180,
+          208,
+          942,
+          1214
+        ],
+        [
+          212,
+          268,
+          936,
+          1214
+        ],
+        [
+          265,
+          306,
+          949,
+          1214
+        ],
+        [
+          303,
+          365,
+          988,
+          1214
+        ],
+        [
+          302,
+          429,
+          1021,
+          1214
+        ],
+        [
+          286,
+          465,
+          1047,
+          1214
+        ],
+        [
+          273,
+          495,
+          1065,
+          1214
+        ],
+        [
+          275,
+          521,
+          1076,
+          1214
+        ],
+        [
+          286,
+          539,
+          1082,
+          1214
+        ],
+        [
+          299,
+          552,
+          1083,
+          1214
+        ],
+        [
+          309,
+          560,
+          1083,
+          1214
+        ],
+        [
+          309,
+          564,
+          1082,
+          1214
+        ],
+        [
+          309,
+          564,
+          1080,
+          1214
+        ]
+      ],
+      "artifacts": {
+        "contact_sheet": "idle-to-walk-right-contact-sheet.png",
+        "preview": "idle-to-walk-right-preview.gif"
+      }
+    },
+    "walk-right-to-idle": {
+      "ok": true,
+      "frame_count": 20,
+      "frame_duration_ms": 70,
+      "loop": false,
+      "dimensions": [
+        1152,
+        1248
+      ],
+      "normal_cell_dimensions": [
+        192,
+        208
+      ],
+      "hidden_rgb_pixels_under_zero_alpha": 0,
+      "touches_safety_edge": false,
+      "unique_frame_hashes": 20,
+      "maximum_adjacent_center_step_px": 48.5,
+      "maximum_adjacent_baseline_step_px": 0,
+      "maximum_adjacent_bbox_area_ratio": 1.1192,
+      "alpha_bboxes": [
+        [
+          309,
+          564,
+          1080,
+          1214
+        ],
+        [
+          309,
+          564,
+          1082,
+          1214
+        ],
+        [
+          309,
+          560,
+          1083,
+          1214
+        ],
+        [
+          299,
+          552,
+          1083,
+          1214
+        ],
+        [
+          286,
+          539,
+          1082,
+          1214
+        ],
+        [
+          275,
+          521,
+          1076,
+          1214
+        ],
+        [
+          273,
+          495,
+          1065,
+          1214
+        ],
+        [
+          286,
+          465,
+          1047,
+          1214
+        ],
+        [
+          302,
+          429,
+          1021,
+          1214
+        ],
+        [
+          303,
+          365,
+          988,
+          1214
+        ],
+        [
+          265,
+          306,
+          949,
+          1214
+        ],
+        [
+          212,
+          268,
+          936,
+          1214
+        ],
+        [
+          180,
+          208,
+          942,
+          1214
+        ],
+        [
+          171,
+          167,
+          945,
+          1214
+        ],
+        [
+          148,
+          139,
+          947,
+          1214
+        ],
+        [
+          128,
+          124,
+          948,
+          1214
+        ],
+        [
+          121,
+          106,
+          948,
+          1214
+        ],
+        [
+          123,
+          68,
+          949,
+          1214
+        ],
+        [
+          131,
+          52,
+          950,
+          1214
+        ],
+        [
+          142,
+          48,
+          952,
+          1214
+        ]
+      ],
+      "artifacts": {
+        "contact_sheet": "walk-right-to-idle-contact-sheet.png",
+        "preview": "walk-right-to-idle-preview.gif"
+      }
+    },
+    "idle-to-walk-left": {
+      "ok": true,
+      "frame_count": 20,
+      "frame_duration_ms": 70,
+      "loop": false,
+      "dimensions": [
+        1152,
+        1248
+      ],
+      "normal_cell_dimensions": [
+        192,
+        208
+      ],
+      "hidden_rgb_pixels_under_zero_alpha": 0,
+      "touches_safety_edge": false,
+      "unique_frame_hashes": 20,
+      "maximum_adjacent_center_step_px": 31.32,
+      "maximum_adjacent_baseline_step_px": 0,
+      "maximum_adjacent_bbox_area_ratio": 1.0885,
+      "alpha_bboxes": [
+        [
+          142,
+          48,
+          952,
+          1214
+        ],
+        [
+          159,
+          52,
+          954,
+          1214
+        ],
+        [
+          179,
+          64,
+          954,
+          1214
+        ],
+        [
+          204,
+          92,
+          954,
+          1214
+        ],
+        [
+          234,
+          129,
+          951,
+          1214
+        ],
+        [
+          266,
+          163,
+          946,
+          1214
+        ],
+        [
+          253,
+          212,
+          948,
+          1214
+        ],
+        [
+          237,
+          274,
+          955,
+          1214
+        ],
+        [
+          220,
+          327,
+          960,
+          1214
+        ],
+        [
+          202,
+          372,
+          962,
+          1214
+        ],
+        [
+          185,
+          416,
+          961,
+          1214
+        ],
+        [
+          170,
+          457,
+          959,
+          1214
+        ],
+        [
+          158,
+          493,
+          954,
+          1214
+        ],
+        [
+          148,
+          524,
+          947,
+          1214
+        ],
+        [
+          142,
+          549,
+          938,
+          1214
+        ],
+        [
+          138,
+          567,
+          927,
+          1214
+        ],
+        [
+          136,
+          580,
+          913,
+          1214
+        ],
+        [
+          136,
+          588,
+          898,
+          1214
+        ],
+        [
+          137,
+          590,
+          891,
+          1214
+        ],
+        [
+          138,
+          564,
+          891,
+          1214
+        ]
+      ],
+      "artifacts": {
+        "contact_sheet": "idle-to-walk-left-contact-sheet.png",
+        "preview": "idle-to-walk-left-preview.gif"
+      }
+    },
+    "walk-left-to-idle": {
+      "ok": true,
+      "frame_count": 20,
+      "frame_duration_ms": 70,
+      "loop": false,
+      "dimensions": [
+        1152,
+        1248
+      ],
+      "normal_cell_dimensions": [
+        192,
+        208
+      ],
+      "hidden_rgb_pixels_under_zero_alpha": 0,
+      "touches_safety_edge": false,
+      "unique_frame_hashes": 20,
+      "maximum_adjacent_center_step_px": 31.32,
+      "maximum_adjacent_baseline_step_px": 0,
+      "maximum_adjacent_bbox_area_ratio": 1.0885,
+      "alpha_bboxes": [
+        [
+          138,
+          564,
+          891,
+          1214
+        ],
+        [
+          137,
+          590,
+          891,
+          1214
+        ],
+        [
+          136,
+          588,
+          898,
+          1214
+        ],
+        [
+          136,
+          580,
+          913,
+          1214
+        ],
+        [
+          138,
+          567,
+          927,
+          1214
+        ],
+        [
+          142,
+          549,
+          938,
+          1214
+        ],
+        [
+          148,
+          524,
+          947,
+          1214
+        ],
+        [
+          158,
+          493,
+          954,
+          1214
+        ],
+        [
+          170,
+          457,
+          959,
+          1214
+        ],
+        [
+          185,
+          416,
+          961,
+          1214
+        ],
+        [
+          202,
+          372,
+          962,
+          1214
+        ],
+        [
+          220,
+          327,
+          960,
+          1214
+        ],
+        [
+          237,
+          274,
+          955,
+          1214
+        ],
+        [
+          253,
+          212,
+          948,
+          1214
+        ],
+        [
+          266,
+          163,
+          946,
+          1214
+        ],
+        [
+          234,
+          129,
+          951,
+          1214
+        ],
+        [
+          204,
+          92,
+          954,
+          1214
+        ],
+        [
+          179,
+          64,
+          954,
+          1214
+        ],
+        [
+          159,
+          52,
+          954,
+          1214
+        ],
+        [
+          142,
+          48,
+          952,
+          1214
+        ]
+      ],
+      "artifacts": {
+        "contact_sheet": "walk-left-to-idle-contact-sheet.png",
+        "preview": "walk-left-to-idle-preview.gif"
+      }
+    }
+  },
+  "exact_reverse_pairs": {
+    "right": true,
+    "left": true
+  },
+  "shared_idle_endpoint": true,
+  "artifacts": {
+    "background_qa": "transition-background-qa.png"
+  }
+}

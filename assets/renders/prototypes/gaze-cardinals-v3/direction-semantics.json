@@ -1,0 +1,32 @@
+{
+  "ok": true,
+  "status": "approved-for-full-loop-synthesis",
+  "labeled_review_ok": true,
+  "directions": {
+    "000": {
+      "verdict": "pass",
+      "expected": "up",
+      "observed": "up",
+      "reason": "Upward eye surfaces and head pitch read clearly."
+    },
+    "090": {
+      "verdict": "pass",
+      "expected": "screen-right",
+      "observed": "screen-right",
+      "reason": "The profile is unmistakably screen-right."
+    },
+    "180": {
+      "verdict": "pass",
+      "expected": "down",
+      "observed": "down",
+      "reason": "Downward eye surfaces and head pitch read clearly with a clean scalp silhouette."
+    },
+    "270": {
+      "verdict": "pass",
+      "expected": "screen-left",
+      "observed": "screen-left",
+      "reason": "The profile is unmistakably screen-left and opposes 090."
+    }
+  },
+  "review_warnings": []
+}

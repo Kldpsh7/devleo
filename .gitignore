@@ -23,5 +23,8 @@ dist/
 assets/work/
 assets/generated/
 assets/production/
+assets/renders/work/
+assets/source-3d/*.blend1
+assets/source-3d/*.blend2
 tmp/
 logs/

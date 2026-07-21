@@ -1,0 +1,3 @@
+visual_qa=pass
+qa_note=The prototype preserves a consistent quadrupedal young-lion identity and visible closed laptop while delivering a coherent subtle 12-frame breathing, blink, tail, ear, and glance loop with stable registration and clean composites.
+repair_notes=none

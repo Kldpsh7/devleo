@@ -40,19 +40,14 @@ MIN_OPACITY = 0.25
 MAX_OPACITY = 1.0
 FRAME_COUNTS = {0: 6, 1: 8, 2: 8, 3: 4, 4: 5, 5: 8, 6: 6, 7: 6, 8: 6, 9: 8, 10: 8}
 CUSTOM_FRAME_COUNTS = {"relax": 8, "focus": 8, "sleep": 8, "motivate": 8, "advice": 8}
-SMOOTH_FRAME_COUNTS = {
-    "idle": 8,
-    "wave": 8,
-    "jump": 8,
-    "waiting": 8,
-    "working": 8,
-    "review": 8,
-}
+# The approved v2 atlas remains authoritative for stationary states. Directional
+# roaming uses isolated higher-frame-count sequences to avoid atlas-slot bleed.
+SMOOTH_FRAME_COUNTS = {"walk-right": 16, "walk-left": 16}
 FRAME_INTERVALS = {
     "idle": 230,
     "walk": 130,
-    "walk-right": 130,
-    "walk-left": 130,
+    "walk-right": 85,
+    "walk-left": 85,
     "wave": 180,
     "jump": 160,
     "failure": 190,
@@ -150,7 +145,7 @@ class PetWindow(QWidget):
         self._content_rects: dict[tuple[str, int], QRect] = {}
         self.native_window_state: dict[str, Any] = {"applied": False}
         self.atlas = QPixmap(str(asset_path("spritesheet.webp")))
-        self.concept = QPixmap(str(asset_path("byte-approved-concept.png")))
+        self.concept = QPixmap(str(asset_path("leo-approved-concept.png")))
         self.mode_frames = self.load_mode_frames()
         self.animation_frames = self.load_animation_frames()
         try:
@@ -1104,8 +1099,8 @@ class PetWindow(QWidget):
             self.native_window_state = {"applied": True, "platform": sys.platform}
             return
         try:
-            import AppKit  # type: ignore[import-not-found]
-            import objc  # type: ignore[import-not-found]
+            import AppKit  # type: ignore[import-untyped]
+            import objc  # type: ignore[import-untyped]
 
             view = objc.objc_object(c_void_p=c_void_p(int(self.winId())))
             window = view.window()
@@ -1141,7 +1136,7 @@ class PetApplication(QApplication):
         self.setQuitOnLastWindowClosed(False)
         self.setApplicationName(DISPLAY_NAME)
         self.setApplicationDisplayName(DISPLAY_NAME)
-        self.icon_path = asset_path("byte-approved-concept.png")
+        self.icon_path = asset_path("leo-approved-concept.png")
         self.setWindowIcon(QIcon(str(self.icon_path)))
         self.setProperty("nativeApplicationIconApplied", self.apply_platform_application_icon())
         self.config = load_config()
@@ -1273,7 +1268,7 @@ class PetApplication(QApplication):
         return menu
 
     def create_tray(self) -> QSystemTrayIcon:
-        tray = QSystemTrayIcon(QIcon(str(asset_path("byte-approved-concept.png"))), self)
+        tray = QSystemTrayIcon(QIcon(str(asset_path("leo-approved-concept.png"))), self)
         tray.setContextMenu(self.menu)
         tray.setToolTip(DISPLAY_NAME)
         tray.show()

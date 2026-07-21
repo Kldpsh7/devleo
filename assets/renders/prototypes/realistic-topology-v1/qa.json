@@ -1,0 +1,346 @@
+{
+  "schema_version": 1,
+  "ok": true,
+  "runtime_replacement": false,
+  "mechanical_topology": {
+    "schema_version": 1,
+    "ok": true,
+    "runtime_replacement": false,
+    "third_party_mesh": false,
+    "project_owned_reference": true,
+    "output": "leo-realistic-topology.blend",
+    "body_object": "Leo_Realistic_Body",
+    "generator": {
+      "blender": "5.2.0 LTS",
+      "script": "tools/blender/retopologize_realistic_leo.py",
+      "pipeline_version": 1
+    },
+    "method": {
+      "source_holes": "bmesh holes_fill",
+      "retopology": "Blender QuadriFlow",
+      "target_faces": 16000,
+      "seed": 7,
+      "symmetry": false,
+      "preserve_attributes": true
+    },
+    "filled_source_holes": 82,
+    "source_vertex_groups": [],
+    "volume_ratio": 0.998772,
+    "source": {
+      "file": "leo-realistic.blend",
+      "mesh": {
+        "vertices": 39840,
+        "edges": 119432,
+        "faces": 79512,
+        "face_sides": {
+          "3": 79512
+        },
+        "boundary_edges": 328,
+        "nonmanifold_edges": 328,
+        "isolated_vertices": 0,
+        "mesh_islands": 1,
+        "unsigned_volume": 5.29257
+      },
+      "materials": [
+        "Leo project-owned turnaround projection"
+      ],
+      "packed_images": [
+        {
+          "name": "front-projection.png",
+          "packed": true,
+          "size": [
+            213,
+            498
+          ]
+        },
+        {
+          "name": "left-projection.png",
+          "packed": true,
+          "size": [
+            666,
+            482
+          ]
+        },
+        {
+          "name": "rear-projection.png",
+          "packed": true,
+          "size": [
+            205,
+            478
+          ]
+        },
+        {
+          "name": "right-projection.png",
+          "packed": true,
+          "size": [
+            621,
+            483
+          ]
+        }
+      ]
+    },
+    "result": {
+      "file": "leo-realistic-topology.blend",
+      "mesh": {
+        "vertices": 15661,
+        "edges": 31318,
+        "faces": 15659,
+        "face_sides": {
+          "4": 15659
+        },
+        "boundary_edges": 0,
+        "nonmanifold_edges": 0,
+        "isolated_vertices": 0,
+        "mesh_islands": 1,
+        "unsigned_volume": 5.286071
+      },
+      "materials": [
+        "Leo project-owned turnaround projection"
+      ],
+      "packed_images": [
+        {
+          "name": "front-projection.png",
+          "packed": true,
+          "size": [
+            213,
+            498
+          ]
+        },
+        {
+          "name": "left-projection.png",
+          "packed": true,
+          "size": [
+            666,
+            482
+          ]
+        },
+        {
+          "name": "rear-projection.png",
+          "packed": true,
+          "size": [
+            205,
+            478
+          ]
+        },
+        {
+          "name": "right-projection.png",
+          "packed": true,
+          "size": [
+            621,
+            483
+          ]
+        }
+      ]
+    },
+    "errors": []
+  },
+  "render_qa": {
+    "approved_source": {
+      "ok": true,
+      "view_count": 8,
+      "dimensions": [
+        768,
+        832
+      ],
+      "maximum_corner_alpha": 0,
+      "edge_failures": [],
+      "alpha_bboxes": [
+        [
+          47,
+          177,
+          721,
+          670
+        ],
+        [
+          169,
+          229,
+          640,
+          696
+        ],
+        [
+          274,
+          253,
+          494,
+          711
+        ],
+        [
+          141,
+          237,
+          655,
+          697
+        ],
+        [
+          47,
+          181,
+          721,
+          673
+        ],
+        [
+          128,
+          139,
+          599,
+          692
+        ],
+        [
+          274,
+          116,
+          494,
+          702
+        ],
+        [
+          112,
+          130,
+          627,
+          694
+        ]
+      ],
+      "artifacts": {
+        "turntable_contact_sheet": "turntable-contact-sheet.png"
+      }
+    },
+    "candidate": {
+      "ok": true,
+      "view_count": 8,
+      "dimensions": [
+        768,
+        832
+      ],
+      "maximum_corner_alpha": 0,
+      "edge_failures": [],
+      "alpha_bboxes": [
+        [
+          47,
+          177,
+          721,
+          669
+        ],
+        [
+          169,
+          230,
+          639,
+          696
+        ],
+        [
+          275,
+          253,
+          493,
+          711
+        ],
+        [
+          141,
+          238,
+          655,
+          697
+        ],
+        [
+          47,
+          181,
+          721,
+          673
+        ],
+        [
+          129,
+          139,
+          599,
+          692
+        ],
+        [
+          275,
+          116,
+          493,
+          702
+        ],
+        [
+          113,
+          130,
+          627,
+          694
+        ]
+      ],
+      "artifacts": {
+        "turntable_contact_sheet": "turntable-contact-sheet.png"
+      }
+    }
+  },
+  "identity_preservation": {
+    "minimum_alpha_iou_gate": 0.99,
+    "maximum_channel_mad_gate": 5.0,
+    "minimum_alpha_iou": 0.996264,
+    "maximum_channel_mad": 2.372,
+    "views": [
+      {
+        "view": "view-00-000.png",
+        "alpha_iou": 0.997364,
+        "rgb_channel_mean_absolute_difference": [
+          2.093,
+          1.696,
+          1.48
+        ]
+      },
+      {
+        "view": "view-01-045.png",
+        "alpha_iou": 0.997762,
+        "rgb_channel_mean_absolute_difference": [
+          2.064,
+          1.724,
+          1.526
+        ]
+      },
+      {
+        "view": "view-02-090.png",
+        "alpha_iou": 0.996264,
+        "rgb_channel_mean_absolute_difference": [
+          2.372,
+          2.027,
+          1.802
+        ]
+      },
+      {
+        "view": "view-03-135.png",
+        "alpha_iou": 0.99724,
+        "rgb_channel_mean_absolute_difference": [
+          2.069,
+          1.587,
+          1.219
+        ]
+      },
+      {
+        "view": "view-04-180.png",
+        "alpha_iou": 0.997874,
+        "rgb_channel_mean_absolute_difference": [
+          2.116,
+          1.622,
+          1.306
+        ]
+      },
+      {
+        "view": "view-05-225.png",
+        "alpha_iou": 0.997992,
+        "rgb_channel_mean_absolute_difference": [
+          2.022,
+          1.536,
+          1.223
+        ]
+      },
+      {
+        "view": "view-06-270.png",
+        "alpha_iou": 0.996858,
+        "rgb_channel_mean_absolute_difference": [
+          2.079,
+          1.676,
+          1.445
+        ]
+      },
+      {
+        "view": "view-07-315.png",
+        "alpha_iou": 0.997127,
+        "rgb_channel_mean_absolute_difference": [
+          1.999,
+          1.601,
+          1.42
+        ]
+      }
+    ]
+  },
+  "errors": []
+}

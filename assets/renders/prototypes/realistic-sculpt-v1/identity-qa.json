@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "runtime_replacement": false,
+  "third_party_mesh": false,
+  "project_owned_reference": true,
+  "mechanical_qa": "pass",
+  "visual_identity": "candidate",
+  "accepted_regions": [
+    "full-turn lion-cub silhouette",
+    "front facial identity",
+    "side coat and anatomy projection",
+    "rear coat projection",
+    "dorsal and tail projection blend"
+  ],
+  "remaining_regions": [
+    "belly transition",
+    "head and ear topology",
+    "paw topology",
+    "tail topology"
+  ],
+  "next_gate": "clean deformation topology turntable"
+}

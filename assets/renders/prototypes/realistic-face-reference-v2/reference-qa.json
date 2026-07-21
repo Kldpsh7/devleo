@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "status": "approved-visual-target",
+  "runtime_replacement": false,
+  "source": "../realistic-model-v1/modeling-turnaround.png",
+  "source_sha256": "76da5771c9a9c2edf1aed6045ebbb987944b35b2eea95d8ff3538a813371510d",
+  "artifact": "diagonal-turnaround.png",
+  "artifact_sha256": "fa1a46274bf7d7b1a2a05ef4610a55a55048d6468b7151788713aa65b28d9ce0",
+  "dimensions": [1254, 1254],
+  "mode": "RGB",
+  "layout": [
+    "front-left three-quarter",
+    "front-right three-quarter",
+    "rear-left three-quarter",
+    "rear-right three-quarter"
+  ],
+  "mechanical_checks": {
+    "view_count": 4,
+    "full_body_visible": true,
+    "no_extra_subjects": true,
+    "no_text_or_watermark": true
+  },
+  "visual_approval": {
+    "status": "approved",
+    "approved_by": "Kuldeep Sharma",
+    "approved_at": "2026-07-17"
+  }
+}

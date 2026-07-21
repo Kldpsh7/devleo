@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "ok": true,
+  "runtime_replacement": false,
+  "frame_count": 12,
+  "pose_count": 6,
+  "views": [
+    "side",
+    "front"
+  ],
+  "dimensions": [
+    768,
+    832
+  ],
+  "maximum_corner_alpha": 0,
+  "edge_failures": [],
+  "alpha_bboxes": [
+    [
+      30,
+      163,
+      738,
+      689
+    ],
+    [
+      264,
+      206,
+      494,
+      707
+    ],
+    [
+      30,
+      160,
+      725,
+      689
+    ],
+    [
+      284,
+      203,
+      494,
+      707
+    ],
+    [
+      30,
+      153,
+      724,
+      689
+    ],
+    [
+      264,
+      188,
+      494,
+      707
+    ],
+    [
+      30,
+      163,
+      738,
+      689
+    ],
+    [
+      264,
+      206,
+      494,
+      700
+    ],
+    [
+      30,
+      163,
+      738,
+      691
+    ],
+    [
+      264,
+      206,
+      494,
+      707
+    ],
+    [
+      100,
+      163,
+      738,
+      689
+    ],
+    [
+      264,
+      206,
+      494,
+      707
+    ]
+  ],
+  "alpha_area_ratios": [
+    1.0,
+    1.0,
+    0.996576,
+    1.014489,
+    0.988721,
+    1.03409,
+    1.035392,
+    0.998125,
+    1.027885,
+    0.999516,
+    0.993248,
+    1.016289
+  ],
+  "rig_report": {
+    "schema_version": 1,
+    "ok": true,
+    "runtime_replacement": false,
+    "source": "leo-realistic-topology.blend",
+    "output": "leo-realistic-rig.blend",
+    "generator": {
+      "blender": "5.2.0 LTS",
+      "script": "tools/blender/rig_realistic_leo.py",
+      "pipeline_version": 1
+    },
+    "rig": {
+      "name": "RIG_Leo_Realistic",
+      "bone_count": 22,
+      "bones": [
+        "root",
+        "pelvis",
+        "spine.01",
+        "spine.02",
+        "neck",
+        "head",
+        "foreleg_upper.L",
+        "foreleg_lower.L",
+        "front_paw.L",
+        "foreleg_upper.R",
+        "foreleg_lower.R",
+        "front_paw.R",
+        "hind_thigh.L",
+        "hind_shin.L",
+        "hind_paw.L",
+        "hind_thigh.R",
+        "hind_shin.R",
+        "hind_paw.R",
+        "tail.01",
+        "tail.02",
+        "tail.03",
+        "tail.04"
+      ]
+    },
+    "binding_method": {
+      "initial_weights": "Blender automatic heat weights",
+      "localization": "smooth anatomical falloff transfer",
+      "maximum_influences_per_vertex": 4
+    },
+    "topology": {
+      "vertices": 15661,
+      "edges": 31318,
+      "faces": 15659,
+      "face_sides": {
+        "4": 15659
+      },
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    "weights": {
+      "deform_bone_count": 21,
+      "vertex_group_count": 21,
+      "weighted_vertices_by_bone": {
+        "foreleg_lower.L": 1234,
+        "foreleg_lower.R": 1275,
+        "foreleg_upper.L": 2512,
+        "foreleg_upper.R": 3009,
+        "front_paw.L": 890,
+        "front_paw.R": 748,
+        "head": 3332,
+        "hind_paw.L": 688,
+        "hind_paw.R": 773,
+        "hind_shin.L": 1231,
+        "hind_shin.R": 1214,
+        "hind_thigh.L": 2434,
+        "hind_thigh.R": 3689,
+        "neck": 4260,
+        "pelvis": 5512,
+        "spine.01": 5438,
+        "spine.02": 5874,
+        "tail.01": 1563,
+        "tail.02": 472,
+        "tail.03": 443,
+        "tail.04": 348
+      },
+      "empty_deform_groups": [],
+      "unweighted_vertices": 0,
+      "maximum_influences_per_vertex": 4,
+      "vertices_over_four_influences": 0,
+      "armature_modifier_count": 1,
+      "armature_modifier_target": "RIG_Leo_Realistic"
+    },
+    "errors": []
+  },
+  "errors": [],
+  "artifacts": {
+    "deformation_contact_sheet": "deformation-contact-sheet.png"
+  }
+}

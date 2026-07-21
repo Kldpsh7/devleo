@@ -65,11 +65,25 @@ def test_custom_modes_use_slower_animation_intervals(monkeypatch: object) -> Non
     window.close()
 
 
-def test_smooth_standard_overrides_load_with_state_specific_timing(monkeypatch: object) -> None:
+def test_standard_states_use_approved_atlas_with_state_specific_timing(
+    monkeypatch: object,
+) -> None:
     window = make_window(monkeypatch)
-    for state in ("idle", "wave", "jump", "waiting", "working", "review"):
-        assert state in window.animation_frames
-        assert window.frame_count(state) == 8
+    expected_frames = {
+        "idle": 6,
+        "wave": 4,
+        "jump": 5,
+        "waiting": 6,
+        "working": 6,
+        "review": 6,
+    }
+    assert set(window.animation_frames) == {"walk-left", "walk-right"}
+    assert window.frame_count("walk-left") == 16
+    assert window.frame_count("walk-right") == 16
+    assert window.animation_interval("walk-left") == 85
+    assert window.animation_interval("walk-right") == 85
+    for state, frame_count in expected_frames.items():
+        assert window.frame_count(state) == frame_count
         assert window.animation_interval(state) > runtime.DEFAULT_FRAME_INTERVAL
     window.close()
 

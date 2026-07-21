@@ -1,0 +1,192 @@
+{
+  "ok": true,
+  "source": "/Users/cs05224/Desktop/projects/lion-cub-pet/assets/work/hatch-leo-roam-repair/smooth-roaming-clean.png",
+  "frame_count": 16,
+  "frame_duration_ms": 85,
+  "cell": [
+    192,
+    208
+  ],
+  "right_output_dir": "/Users/cs05224/Desktop/projects/lion-cub-pet/assets/work/hatch-leo-roam-repair/final/walk-right",
+  "left_output_dir": "/Users/cs05224/Desktop/projects/lion-cub-pet/assets/work/hatch-leo-roam-repair/final/walk-left",
+  "left_derivation": "framewise-horizontal-mirror-preserving-order",
+  "unique_right_frames": 16,
+  "frames": [
+    {
+      "frame": 0,
+      "bbox": [
+        5,
+        43,
+        187,
+        164
+      ],
+      "edge_pixels": 0,
+      "sha256_rgba": "fe13c8ea9a14986084c3a59e382653adb769f3fd8368c53eb2f6d615b0a49dcb"
+    },
+    {
+      "frame": 1,
+      "bbox": [
+        5,
+        40,
+        187,
+        167
+      ],
+      "edge_pixels": 0,
+      "sha256_rgba": "0c46aed903fc9f8de0c1cb5f09f5b122588ae1925b860431584d28a762a14a0c"
+    },
+    {
+      "frame": 2,
+      "bbox": [
+        5,
+        39,
+        187,
+        169
+      ],
+      "edge_pixels": 0,
+      "sha256_rgba": "7afefa7107c615edf67077acb4da21876efc87afea79d012a9f38914c7436c19"
+    },
+    {
+      "frame": 3,
+      "bbox": [
+        5,
+        37,
+        187,
+        171
+      ],
+      "edge_pixels": 0,
+      "sha256_rgba": "fabd5f50d77724607ee7bc84813c278065ca8683a3df63ca0ba4f69d6e0009d0"
+    },
+    {
+      "frame": 4,
+      "bbox": [
+        5,
+        40,
+        187,
+        167
+      ],
+      "edge_pixels": 0,
+      "sha256_rgba": "12eadc1980da4527166e957152cc3bc3f62a99189b15faa9dc5bfe9f83c4bd52"
+    },
+    {
+      "frame": 5,
+      "bbox": [
+        5,
+        42,
+        187,
+        165
+      ],
+      "edge_pixels": 0,
+      "sha256_rgba": "8be50d9011069b860e2bdba57d5129f8e4be72f1c151c84951361264460718bb"
+    },
+    {
+      "frame": 6,
+      "bbox": [
+        5,
+        46,
+        187,
+        161
+      ],
+      "edge_pixels": 0,
+      "sha256_rgba": "59a8006347f0c137c8d3cd868269c9d89f667797901fae0b2ba15931c3157fdf"
+    },
+    {
+      "frame": 7,
+      "bbox": [
+        5,
+        36,
+        187,
+        171
+      ],
+      "edge_pixels": 0,
+      "sha256_rgba": "c4d25b44a7abf362472aaadbc46a2d5e441f910c6a84c8d40f8f758a1d959168"
+    },
+    {
+      "frame": 8,
+      "bbox": [
+        5,
+        41,
+        187,
+        167
+      ],
+      "edge_pixels": 0,
+      "sha256_rgba": "8d490985236392b01a9fc6b8438e7e2d6935947063f7d0a7ff6987ea021a1bd9"
+    },
+    {
+      "frame": 9,
+      "bbox": [
+        5,
+        46,
+        187,
+        161
+      ],
+      "edge_pixels": 0,
+      "sha256_rgba": "593b167a2bbc4711f62b6a124e713ce75d9fa15041c22b7ac2ce4f00bed1aa41"
+    },
+    {
+      "frame": 10,
+      "bbox": [
+        5,
+        37,
+        187,
+        171
+      ],
+      "edge_pixels": 0,
+      "sha256_rgba": "c1b2bcf1be47a6949481483353b7f654c4c05a6ee16f9a4eab25994a9f6d5c42"
+    },
+    {
+      "frame": 11,
+      "bbox": [
+        5,
+        37,
+        187,
+        170
+      ],
+      "edge_pixels": 0,
+      "sha256_rgba": "08b8e3ace0f7ed03757ca93388c6d9c186b5296dc0be7357010f61f14f5dfe8b"
+    },
+    {
+      "frame": 12,
+      "bbox": [
+        5,
+        38,
+        187,
+        169
+      ],
+      "edge_pixels": 0,
+      "sha256_rgba": "3282ef4f5a6d4709492a96830ed81b1060ae122db17def608d766fbb73ddf1a4"
+    },
+    {
+      "frame": 13,
+      "bbox": [
+        5,
+        43,
+        187,
+        165
+      ],
+      "edge_pixels": 0,
+      "sha256_rgba": "c23fde45b378733a8371bab117b73e624c698bc6f6fd43650e4b30ac3f172c3e"
+    },
+    {
+      "frame": 14,
+      "bbox": [
+        5,
+        49,
+        187,
+        158
+      ],
+      "edge_pixels": 0,
+      "sha256_rgba": "055fb0e5c2e38d8e545fbc781f2b733f212601427e63d8bce9888f9c33bff4ce"
+    },
+    {
+      "frame": 15,
+      "bbox": [
+        5,
+        43,
+        187,
+        164
+      ],
+      "edge_pixels": 0,
+      "sha256_rgba": "d7a3b72b8b63caf6d9acf03bdd161d54badd0a491b5c286bf288914388346f36"
+    }
+  ]
+}

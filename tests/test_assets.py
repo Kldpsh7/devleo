@@ -1,5 +1,6 @@
 from importlib.resources import files
 
+from PySide6.QtCore import Qt
 from PySide6.QtGui import QImage, QImageReader
 
 
@@ -15,9 +16,28 @@ def test_left_gait_is_framewise_mirror_without_reordering() -> None:
     path = files("lion_cub_pet.assets").joinpath("spritesheet.webp")
     atlas = QImage(str(path))
     for frame in range(8):
-        right = atlas.copy(frame * 192, 208, 192, 208).mirrored(True, False)
+        right = atlas.copy(frame * 192, 208, 192, 208).flipped(Qt.Orientation.Horizontal)
         left = atlas.copy(frame * 192, 416, 192, 208)
         assert right == left, frame
+
+
+def test_smooth_roaming_frames_are_clean_and_framewise_mirrored() -> None:
+    root = files("lion_cub_pet.assets")
+    for frame in range(16):
+        right = QImage(str(root.joinpath(f"animations/walk-right/{frame:02}.png")))
+        left = QImage(str(root.joinpath(f"animations/walk-left/{frame:02}.png")))
+        assert not right.isNull(), ("walk-right", frame)
+        assert not left.isNull(), ("walk-left", frame)
+        assert (right.width(), right.height()) == (192, 208)
+        assert (left.width(), left.height()) == (192, 208)
+        assert right.flipped(Qt.Orientation.Horizontal) == left, frame
+
+        for x in range(192):
+            assert right.pixelColor(x, 0).alpha() == 0, (frame, x, "top")
+            assert right.pixelColor(x, 207).alpha() == 0, (frame, x, "bottom")
+        for y in range(208):
+            assert right.pixelColor(0, y).alpha() == 0, (frame, y, "left")
+            assert right.pixelColor(191, y).alpha() == 0, (frame, y, "right")
 
 
 def test_custom_mode_frames_have_runtime_geometry() -> None:
@@ -31,7 +51,7 @@ def test_custom_mode_frames_have_runtime_geometry() -> None:
             assert (size.width(), size.height()) == (192, 208), (mode, frame)
 
 
-def test_smooth_standard_overrides_have_runtime_geometry() -> None:
+def test_legacy_smooth_standard_assets_have_runtime_geometry() -> None:
     root = files("lion_cub_pet.assets")
     for state in ("idle", "wave", "jump", "waiting", "working", "review"):
         for frame in range(8):
@@ -41,20 +61,21 @@ def test_smooth_standard_overrides_have_runtime_geometry() -> None:
             assert (size.width(), size.height()) == (192, 208), (state, frame)
 
 
-def test_idle_closed_laptop_lid_remains_readable() -> None:
-    root = files("lion_cub_pet.assets")
-    for frame in range(8):
-        image = QImage(str(root.joinpath(f"animations/idle/{frame:02}.png")))
-        neutral_lid_pixels = 0
-        for y in range(145, 208):
-            for x in range(192):
-                color = image.pixelColor(x, y)
-                channels = (color.red(), color.green(), color.blue())
-                average = sum(channels) // 3
-                if (
-                    color.alpha() >= 160
-                    and max(channels) - min(channels) <= 50
-                    and 45 <= average <= 225
-                ):
-                    neutral_lid_pixels += 1
-        assert neutral_lid_pixels >= 2400, (frame, neutral_lid_pixels)
+def test_closed_laptop_lid_remains_readable_while_moving_or_jumping() -> None:
+    atlas = QImage(str(files("lion_cub_pet.assets").joinpath("spritesheet.webp")))
+    for row, frame_count in ((1, 8), (2, 8), (4, 5)):
+        for frame in range(frame_count):
+            image = atlas.copy(frame * 192, row * 208, 192, 208)
+            neutral_lid_pixels = 0
+            for y in range(208):
+                for x in range(192):
+                    color = image.pixelColor(x, y)
+                    channels = (color.red(), color.green(), color.blue())
+                    average = sum(channels) // 3
+                    if (
+                        color.alpha() >= 160
+                        and max(channels) - min(channels) <= 50
+                        and 45 <= average <= 225
+                    ):
+                        neutral_lid_pixels += 1
+            assert neutral_lid_pixels >= 1000, (row, frame, neutral_lid_pixels)
