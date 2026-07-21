@@ -311,9 +311,7 @@ lion-cub-pet/
 │   ├── README.md
 │   ├── source/          # original high-resolution working art
 │   ├── source-3d/       # reproducible Blender source scenes
-│   ├── approved/        # reviewed master frames and metadata
-│   ├── renders/         # Blender work/approval boundaries
-│   └── runtime/         # deterministic runtime exports
+│   └── approved/        # current reviewed master frames and metadata
 ├── docs/
 │   ├── ARCHITECTURE.md
 │   └── GRAPHICS_QUALITY.md
@@ -323,7 +321,7 @@ lion-cub-pet/
 │   ├── animation/
 │   ├── movement/
 │   ├── platform/
-│   └── assets/
+│   └── assets/          # packaged runtime artwork
 ├── tests/
 ├── tools/blender/       # headless scene, render, and QA pipeline
 ├── pyproject.toml

@@ -31,7 +31,7 @@ motion while keeping stationary and locomotion families on the same desktop
 baseline. The result remains a candidate until deterministic atlas QA and final
 normal-size visual review pass; this command does not modify installed assets.
 
-The approved isolated package and retained QA evidence live under
-`assets/renders/prototypes/runtime-export-v1`. The current desktop package remains
-unchanged until the custom Blender mode families are complete and the runtime is
-explicitly switched to the new density-aware assets.
+The candidate package and QA evidence are generated under the ignored
+`assets/renders/work/runtime-export-v1/` directory. The current desktop package
+remains unchanged until the custom Blender mode families are complete, the
+candidate is reviewed, and the runtime is explicitly switched to it.

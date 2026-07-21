@@ -83,8 +83,9 @@ jobs:
         run: >-
           python -c "from importlib.resources import files;
           root=files('lion_cub_pet.assets');
-          required=['spritesheet.webp','byte-approved-concept.png',
-          'animations/working/00.png','modes/focus/00.png'];
+          required=['spritesheet.webp','leo-approved-concept.png',
+          'animations/walk-right/00.png','animations/walk-left/00.png',
+          'modes/focus/00.png'];
           assert all(root.joinpath(path).is_file() for path in required), required"
       - uses: actions/upload-artifact@v4
         if: matrix.os == 'ubuntu-latest'

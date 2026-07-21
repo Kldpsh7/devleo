@@ -1,7 +1,0 @@
-visual_qa=fail
-scope=mechanical quadruped deformation smoke test only
-mechanical_result=Bone hierarchy, vertex weights, mesh continuity, render safety, and diagnostic deformation passed.
-failure=The projected face is distorted in neutral and posed front, profile, and three-quarter views because its geometry does not match the source cub's skull, eyes, muzzle, or ears.
-review_warnings=This candidate must not be treated as visual approval or reused for production animation.
-runtime_replacement=false
-next_gate=rebuild neutral head and pass front, profile, and both three-quarter visual review before rigging

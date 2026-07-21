@@ -50,8 +50,9 @@ tools/blender/render_idle.sh
 ### Realistic identity reconstruction gate
 
 The realistic rebuild is evaluated independently before rigging or laptop work.
-Its approved modeling references and rejected reconstruction evidence live in
-`assets/renders/prototypes/realistic-model-v1/`.
+Its canonical project-owned references live in
+`assets/source/realistic-identity-reference/`. Generated reconstruction evidence
+belongs under the ignored `assets/renders/work/` directory.
 
 Render an eight-view preview for any reconstructed GLB:
 
@@ -79,10 +80,10 @@ projections, eight-view preview, and mechanical QA in one command:
 tools/blender/render_realistic_identity.sh
 ```
 
-The checkpoint is stored in `assets/source-3d/leo-realistic.blend`, with review
-evidence in `assets/renders/prototypes/realistic-sculpt-v1/`. It is still isolated
-from the runtime while head/ear/paw topology and the belly projection transition
-remain under review.
+The checkpoint is stored in `assets/source-3d/leo-realistic.blend`. Generated
+review evidence goes to `assets/renders/work/realistic-identity/`. It is still
+isolated from the runtime while head/ear/paw topology and the belly projection
+transition remain under review.
 
 Build the isolated clean-topology candidate and compare it against the approved
 identity turntable:

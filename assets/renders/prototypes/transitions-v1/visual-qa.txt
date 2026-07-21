@@ -1,8 +1,0 @@
-visual_qa=pass
-qa_note=Candidate 5 repairs the prior defect: Leo remains consistent and the laptop follows an exterior, paw-supported path without material torso penetration.
-transition_verdicts=idle-to-walk-right:pass smooth supported lift, outside arc, crouch, and right-facing Walk;walk-right-to-idle:pass exact reverse remains smooth with controlled recovery;idle-to-walk-left:pass equivalent supported exterior transfer into left-facing Walk;walk-left-to-idle:pass exact reverse remains smooth with controlled recovery
-grounding_verdict=pass baseline movement is 0px and supporting paws remain planted
-laptop_verdict=pass closed laptop stays continuous, visibly contacted by the carrying foreleg, and clears the torso before flank placement
-motion_evidence=each clip has 20 unique frames at 70ms, exact reverse pairs, shared Idle endpoint, maximum normal-size center steps of 8.08px right and 5.22px left, no safety-edge contact, and clean light/dark/saturated-background readability
-review_warnings=none
-repair_notes=none

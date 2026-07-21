@@ -1,5 +1,0 @@
-visual_qa=pass
-qa_note=The repaired cardinals are unmistakable at 192x208, preserve Leo's natural identity and fixed registration, and keep all eye surfaces, anatomy, and laptop geometry clean and intact.
-cardinal_semantics=000:pass raised irises with lower globe exposure and upward head pitch;090:pass irises shift screen-right with matching nose, muzzle, and cheek yaw;180:pass lowered irises with upper globe exposure and downward head pitch;270:pass irises shift screen-left with opposing nose, muzzle, and cheek yaw
-review_warnings=none
-repair_notes=none

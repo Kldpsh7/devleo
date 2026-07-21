@@ -1,6 +1,0 @@
-visual_qa=pass
-qa_note=All 16 labeled poses preserve Leo, fixed registration, valid eye apertures, clean silhouettes, and a continuous clockwise gaze loop at master and 192x208 scale.
-direction_semantics=000:pass up;022.5:pass up-right;045:pass up-right;067.5:pass up-right;090:pass right;112.5:pass down-right;135:pass down-right;157.5:pass down-right;180:pass down;202.5:pass down-left;225:pass down-left;247.5:pass down-left;270:pass left;292.5:pass up-left;315:pass up-left;337.5:pass up-left
-axis_evidence=horizontal:right-side diagonals progressively yaw screen-right while left-side diagonals mirror screen-left, with 337.5 subtly left between 315 and 000|vertical:upward pitch diminishes from 000 to 090, downward pitch grows to 180, and the pattern mirrors continuously through 270 to 000
-review_warnings=337.5 horizontal cue is subtle and blind-ambiguous at 192x208, but labeled landmarks and the smooth 315 to 337.5 to 000 sequence confirm up-left without reversal.
-repair_notes=none

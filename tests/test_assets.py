@@ -51,16 +51,6 @@ def test_custom_mode_frames_have_runtime_geometry() -> None:
             assert (size.width(), size.height()) == (192, 208), (mode, frame)
 
 
-def test_legacy_smooth_standard_assets_have_runtime_geometry() -> None:
-    root = files("lion_cub_pet.assets")
-    for state in ("idle", "wave", "jump", "waiting", "working", "review"):
-        for frame in range(8):
-            reader = QImageReader(str(root.joinpath(f"animations/{state}/{frame:02}.png")))
-            size = reader.size()
-            assert reader.canRead(), (state, frame)
-            assert (size.width(), size.height()) == (192, 208), (state, frame)
-
-
 def test_closed_laptop_lid_remains_readable_while_moving_or_jumping() -> None:
     atlas = QImage(str(files("lion_cub_pet.assets").joinpath("spritesheet.webp")))
     for row, frame_count in ((1, 8), (2, 8), (4, 5)):

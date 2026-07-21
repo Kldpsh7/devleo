@@ -1,4 +1,0 @@
-visual_qa=pass
-qa_note=All four animations preserve Leo and laptop geometry, read smoothly with correct state-specific motion and sequencing, and remain stable, clean, unclipped, and effect-free.
-review_warnings=Waiting head tilt and behind-lid paw/trackpad actions are subtle at preview size but remain readable through expression, body, ear, and tail motion.
-repair_notes=none

@@ -1,5 +1,0 @@
-visual_qa=pass
-scope=clean-topology identity preservation only
-evidence=Eight-view review shows no visible silhouette break, detached part, projection loss, framing regression, or new dorsal seam compared with the approved realistic identity candidate.
-runtime_replacement=false
-next_gate=feline joint deformation smoke test and anatomy refinement

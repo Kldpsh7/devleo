@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 BLENDER=${BLENDER:-/Applications/Blender.app/Contents/MacOS/Blender}
 PYTHON=${PYTHON:-"$ROOT/.venv/bin/python"}
-REFERENCE=${LEO_REALISTIC_REFERENCE:-"$ROOT/assets/renders/prototypes/realistic-model-v1/modeling-turnaround.png"}
+REFERENCE=${LEO_REALISTIC_REFERENCE:-"$ROOT/assets/source/realistic-identity-reference/cardinal-turnaround.png"}
 SEED=${LEO_REALISTIC_SEED:-"$ROOT/assets/source-3d/leo-realistic-seed.blend"}
 SOURCE=${LEO_REALISTIC_SOURCE:-"$ROOT/assets/source-3d/leo-realistic.blend"}
 WORK=${LEO_REALISTIC_WORK:-"$ROOT/assets/renders/work/realistic-identity"}

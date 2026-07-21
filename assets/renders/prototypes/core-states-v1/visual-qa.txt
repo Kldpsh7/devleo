@@ -1,4 +1,0 @@
-visual_qa=pass
-qa_note=All five poses preserve Leo's identity, required laptop orientation and lid states, distinct review squint, readable failure contact, stable transparency, and unclipped anatomy.
-review_warnings=Waiting head tilt is subtle at preview size.
-repair_notes=none

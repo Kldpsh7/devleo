@@ -1,4 +1,0 @@
-visual_qa=pass
-qa_note=Leo reads as a coherent stylized young lion with stable proportions, attached details, a visible laptop lid, clean alpha, readable scaling, and a slow cohesive idle loop.
-review_warnings=none
-repair_notes=none

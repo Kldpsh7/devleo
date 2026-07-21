@@ -4,14 +4,19 @@ Expected layout:
 
 ```text
 assets/
-├── source/       # high-resolution generation outputs and original references
-├── approved/     # reviewed master frames and manifests
-└── runtime/      # deterministic 1x, 2x, and 4x exports consumed by the app
+├── source/       # canonical high-resolution visual references
+├── source-3d/    # reproducible Blender source scenes
+└── approved/     # current reviewed master frames and manifests
 ```
 
-`source/` and intermediate generated work are not runtime inputs. Only files promoted into `approved/` may be exported into `runtime/`. The current runtime source is `approved/leo-the-dev-realistic-v2/`; the older `approved/byte/` release is retained as history.
+`source/` and intermediate generated work are not runtime inputs. The current
+approved art lives in `approved/leo-the-dev-realistic-v2/`; the installed app
+loads its packaged copies from `src/lion_cub_pet/assets/`.
 
-Large disposable generation intermediates should stay under ignored `assets/work/` or `assets/generated/` paths. Do not commit secrets, temporary prompts containing private context, or unreviewed generated variants.
+Large disposable generation and Blender render intermediates must stay under
+ignored `assets/work/`, `assets/generated/`, or `assets/renders/work/` paths.
+Do not commit secrets, temporary prompts containing private context, or
+unreviewed generated variants.
 
 See [Graphics Quality](../docs/GRAPHICS_QUALITY.md).
 
