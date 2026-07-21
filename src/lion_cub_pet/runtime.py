@@ -13,14 +13,16 @@ from importlib.resources import files
 from pathlib import Path
 from typing import Any
 
-from PySide6.QtCore import QPoint, QRect, QSize, Qt, QTimer
+from PySide6.QtCore import QPoint, QPointF, QRect, QSize, Qt, QTimer
 from PySide6.QtGui import (
     QAction,
     QContextMenuEvent,
+    QCursor,
     QGuiApplication,
     QIcon,
     QMouseEvent,
     QMoveEvent,
+    QPainter,
     QPixmap,
     QResizeEvent,
     QScreen,
@@ -82,6 +84,17 @@ STATIONARY_ANIMATIONS = {
     "advice",
 }
 ROAMING_ANIMATIONS = {"walk", "walk-right", "walk-left"}
+MAX_ROAM_TILT_DEGREES = 8.0
+ROAM_EDGE_MARGIN = 4
+MIN_INWARD_TRAVEL = 48
+MIN_ROAM_TRAVEL = 150
+MIN_HORIZONTAL_TRAVEL_RATIO = 0.25
+ROAM_TARGET_ATTEMPTS = 16
+CURSOR_AVOIDANCE_RADIUS = 120
+RUN_SPEED_MULTIPLIER = 1.55
+RUN_FRAME_INTERVAL_FACTOR = 0.72
+ROAM_EASING_DISTANCE = 120
+MIN_ROAM_SPEED_FACTOR = 0.3
 SHOWCASE_STEPS = (
     ("Idle", "animation", "idle"),
     ("Walk right", "animation", "walk-right"),
@@ -126,6 +139,10 @@ def application_screens() -> list[QScreen]:
     return QGuiApplication.screens()
 
 
+def cursor_position() -> QPoint:
+    return QCursor.pos()
+
+
 class PetWindow(QWidget):
     def __init__(self, config: PetConfig) -> None:
         super().__init__()
@@ -139,6 +156,12 @@ class PetWindow(QWidget):
         self.active_animation = "idle"
         self.last_tick = time.monotonic()
         self.target: QPoint | None = None
+        self.movement_tilt_degrees = 0.0
+        self.roaming_run = False
+        self.roam_leg_start: QPointF | None = None
+        self.roam_position: QPointF | None = None
+        self.roam_speed_factor = 0.0
+        self.last_cursor_replan_at = 0.0
         self.wait_until = 0.0
         self.context_menu: QMenu | None = None
         self.context_menu_open_count = 0
@@ -171,6 +194,14 @@ class PetWindow(QWidget):
         self.label = QLabel(self)
         self.label.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignBottom)
         self.label.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        self.debug_label = QLabel(self)
+        self.debug_label.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        self.debug_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+        self.debug_label.setStyleSheet(
+            "background: rgba(0, 0, 0, 180); color: #8fffa0; padding: 3px; font: 9px monospace;"
+        )
+        self.debug_label.setWordWrap(False)
+        self.debug_label.setVisible(False)
         self.bubble = ThoughtBubble(self)
         self.apply_size()
         self.config.opacity = min(max(float(config.opacity), MIN_OPACITY), MAX_OPACITY)
@@ -206,6 +237,7 @@ class PetWindow(QWidget):
         )
         self.setFixedSize(size)
         self.label.setGeometry(QRect(QPoint(0, 0), size))
+        self.debug_label.setGeometry(2, 2, max(1, size.width() - 4), min(76, size.height() - 4))
         self.update_label_geometry()
         if hasattr(self, "bubble"):
             self.position_bubble()
@@ -244,7 +276,10 @@ class PetWindow(QWidget):
         name = animation or self.active_animation
         if name.startswith("look-"):
             return 200
-        return FRAME_INTERVALS.get(name, DEFAULT_FRAME_INTERVAL)
+        interval = FRAME_INTERVALS.get(name, DEFAULT_FRAME_INTERVAL)
+        if name in ROAMING_ANIMATIONS and self.roaming_run:
+            return round(interval * RUN_FRAME_INTERVAL_FACTOR)
+        return interval
 
     def source_pixmap(self, animation: str, frame: int) -> QPixmap:
         if animation.startswith("look-"):
@@ -321,9 +356,12 @@ class PetWindow(QWidget):
         self._content_rects[key] = rect
         return rect
 
-    def base_scaled_content_rect(self) -> QRect:
-        rect = self.content_rect()
-        factor = self.render_factor()
+    def base_scaled_content_rect(
+        self, animation: str | None = None, frame: int | None = None
+    ) -> QRect:
+        animation = animation or self.active_animation
+        rect = self.content_rect(animation, frame)
+        factor = self.render_factor(animation)
         target_width = round(self.width() * factor)
         target_height = round(self.height() * factor)
         offset_x = (self.width() - target_width) // 2
@@ -365,12 +403,65 @@ class PetWindow(QWidget):
             area.bottom() - content.bottom(),
         )
 
+    def roaming_position_limits(self) -> tuple[int, int, int, int]:
+        """Return a stable envelope that fits every directional roaming frame."""
+        area = self.work_area()
+        rects = [
+            self.base_scaled_content_rect(animation, frame)
+            for animation in ("walk-right", "walk-left")
+            for frame in range(self.frame_count(animation))
+        ]
+        return (
+            max(area.left() - rect.left() for rect in rects),
+            min(area.right() - rect.right() for rect in rects),
+            max(area.top() - rect.top() for rect in rects),
+            min(area.bottom() - rect.bottom() for rect in rects),
+        )
+
+    @staticmethod
+    def clamp_to_limits(point: QPoint, limits: tuple[int, int, int, int]) -> QPoint:
+        min_x, max_x, min_y, max_y = limits
+        return QPoint(
+            min(max(point.x(), min_x), max_x),
+            min(max(point.y(), min_y), max_y),
+        )
+
     def clamp(self, point: QPoint) -> QPoint:
         min_x, max_x, min_y, max_y = self.position_limits()
         return QPoint(
             min(max(point.x(), min_x), max_x),
             min(max(point.y(), min_y), max_y),
         )
+
+    def refresh_position_limits(self) -> None:
+        """Reapply the active placement contract after geometry changes."""
+        self.update_label_geometry()
+        if self.config.anchor in {"top-left", "top-right", "bottom-left", "bottom-right"}:
+            self.move(self.anchor_position(self.config.anchor))
+        elif self.config.movement == "roam":
+            limits = self.roaming_position_limits()
+            self.move(self.clamp_to_limits(self.pos(), limits))
+            self.reset_roam_motion()
+            if self.target is not None and self.clamp_to_limits(self.target, limits) != self.target:
+                self.target = None
+                self.movement_tilt_degrees = 0.0
+        else:
+            self.move(self.clamp(self.pos()))
+        self.position_bubble()
+        self.update_movement_debug()
+
+    def screen_geometry_changed(self, *_args: object) -> None:
+        screens = application_screens()
+        if not screens:
+            return
+        self.config.screen = min(max(self.config.screen, 0), len(screens) - 1)
+        self.refresh_position_limits()
+        self.persist_position()
+
+    def reset_roam_motion(self) -> None:
+        self.roam_position = QPointF(self.pos())
+        self.roam_leg_start = QPointF(self.pos())
+        self.roam_speed_factor = 0.0
 
     def anchor_position(self, anchor: str) -> QPoint:
         min_x, max_x, min_y, max_y = self.position_limits()
@@ -453,6 +544,20 @@ class PetWindow(QWidget):
                 Qt.AspectRatioMode.KeepAspectRatio,
                 Qt.TransformationMode.SmoothTransformation,
             )
+            if (
+                self.active_animation in ROAMING_ANIMATIONS
+                and abs(self.movement_tilt_degrees) > 0.05
+            ):
+                tilted = QPixmap(pixmap.size())
+                tilted.fill(Qt.GlobalColor.transparent)
+                painter = QPainter(tilted)
+                painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
+                painter.translate(pixmap.width() / 2, pixmap.height() / 2)
+                painter.rotate(self.movement_tilt_degrees)
+                painter.translate(-pixmap.width() / 2, -pixmap.height() / 2)
+                painter.drawPixmap(0, 0, pixmap)
+                painter.end()
+                pixmap = tilted
         else:
             pixmap = self.concept.scaled(
                 self.size(),
@@ -462,6 +567,43 @@ class PetWindow(QWidget):
         self.label.setPixmap(pixmap)
         self.update_label_geometry()
         self.position_bubble()
+        self.update_movement_debug()
+
+    def movement_debug_state(self) -> dict[str, Any]:
+        limits = list(self.roaming_position_limits()) if self.config.debug_movement else None
+        target = self.target
+        dx = target.x() - self.x() if target is not None else 0
+        dy = target.y() - self.y() if target is not None else 0
+        vertical = "up" if dy < 0 else "down" if dy > 0 else ""
+        horizontal = "left" if dx < 0 else "right" if dx > 0 else ""
+        direction = "-".join(part for part in (vertical, horizontal) if part) or "idle"
+        return {
+            "enabled": self.config.debug_movement,
+            "bounds": limits,
+            "target": [target.x(), target.y()] if target is not None else None,
+            "vector": [dx, dy],
+            "direction": direction,
+            "tilt_degrees": round(self.movement_tilt_degrees, 2),
+            "gait": "run" if self.roaming_run else "walk",
+            "speed_factor": round(self.roam_speed_factor, 3),
+            "cursor_avoidance": self.config.avoid_cursor,
+        }
+
+    def update_movement_debug(self) -> None:
+        if not self.config.debug_movement:
+            self.debug_label.hide()
+            return
+        state = self.movement_debug_state()
+        bounds = state["bounds"]
+        target = state["target"] or ["-", "-"]
+        vector = state["vector"]
+        self.debug_label.setText(
+            f"B {bounds[0]},{bounds[2]}..{bounds[1]},{bounds[3]}\n"
+            f"T {target[0]},{target[1]}  {state['direction']} {vector[0]},{vector[1]}\n"
+            f"{state['gait']} x{state['speed_factor']:.2f}  tilt {state['tilt_degrees']:+.1f}°"
+        )
+        self.debug_label.show()
+        self.debug_label.raise_()
 
     def on_animation_changed(self, animation: str) -> None:
         category = CUSTOM_FALLBACKS.get(animation, animation)
@@ -673,12 +815,111 @@ class PetWindow(QWidget):
         self.context_menu_open_count += 1
         self.context_menu.popup(global_pos)
 
-    def choose_target(self) -> None:
-        min_x, max_x, min_y, max_y = self.position_limits()
-        self.target = QPoint(
-            random.randint(min_x, max_x),
-            random.randint(min_y, max_y),
+    def pet_center_at(self, point: QPoint) -> QPoint:
+        return point + QPoint(self.width() // 2, self.height() // 2)
+
+    def distance_from_cursor(self, point: QPoint, cursor: QPoint) -> float:
+        center = self.pet_center_at(point)
+        return math.hypot(center.x() - cursor.x(), center.y() - cursor.y())
+
+    def cursor_is_close(self) -> bool:
+        if not self.config.avoid_cursor:
+            return False
+        radius = CURSOR_AVOIDANCE_RADIUS * self.config.scale
+        return self.distance_from_cursor(self.pos(), cursor_position()) < radius
+
+    def roam_easing_factor(self, remaining: float) -> float:
+        if self.roam_leg_start is None or self.target is None:
+            return MIN_ROAM_SPEED_FACTOR
+        total = math.hypot(
+            self.target.x() - self.roam_leg_start.x(),
+            self.target.y() - self.roam_leg_start.y(),
         )
+        if total <= 0:
+            return MIN_ROAM_SPEED_FACTOR
+        travelled = max(0.0, total - remaining)
+        ramp_distance = min(ROAM_EASING_DISTANCE * self.config.scale, total / 2)
+        if ramp_distance <= 0:
+            return MIN_ROAM_SPEED_FACTOR
+        progress = min(1.0, travelled / ramp_distance, remaining / ramp_distance)
+        smooth = progress * progress * (3 - 2 * progress)
+        return MIN_ROAM_SPEED_FACTOR + (1 - MIN_ROAM_SPEED_FACTOR) * smooth
+
+    def choose_target(self) -> None:
+        min_x, max_x, min_y, max_y = self.roaming_position_limits()
+
+        def choose_axis(current: int, minimum: int, maximum: int) -> int:
+            minimum_travel = min(round(MIN_INWARD_TRAVEL * self.config.scale), maximum - minimum)
+            if current <= minimum + ROAM_EDGE_MARGIN:
+                return random.randint(min(maximum, current + minimum_travel), maximum)
+            if current >= maximum - ROAM_EDGE_MARGIN:
+                return random.randint(minimum, max(minimum, current - minimum_travel))
+            return random.randint(minimum, maximum)
+
+        def points_inward(candidate: QPoint) -> bool:
+            if self.x() <= min_x + ROAM_EDGE_MARGIN and candidate.x() <= self.x():
+                return False
+            if self.x() >= max_x - ROAM_EDGE_MARGIN and candidate.x() >= self.x():
+                return False
+            if self.y() <= min_y + ROAM_EDGE_MARGIN and candidate.y() <= self.y():
+                return False
+            return not (self.y() >= max_y - ROAM_EDGE_MARGIN and candidate.y() >= self.y())
+
+        cursor = cursor_position() if self.config.avoid_cursor else None
+        minimum_distance = MIN_ROAM_TRAVEL * self.config.scale
+        cursor_radius = CURSOR_AVOIDANCE_RADIUS * self.config.scale
+        candidates = [
+            QPoint(
+                choose_axis(self.x(), min_x, max_x),
+                choose_axis(self.y(), min_y, max_y),
+            )
+            for _ in range(ROAM_TARGET_ATTEMPTS)
+        ]
+
+        def is_good(candidate: QPoint) -> bool:
+            dx, dy = candidate.x() - self.x(), candidate.y() - self.y()
+            distance = math.hypot(dx, dy)
+            return (
+                points_inward(candidate)
+                and distance >= minimum_distance
+                and abs(dx) / max(distance, 1.0) >= MIN_HORIZONTAL_TRAVEL_RATIO
+                and (
+                    cursor is None or self.distance_from_cursor(candidate, cursor) >= cursor_radius
+                )
+            )
+
+        good = [candidate for candidate in candidates if is_good(candidate)]
+        if good:
+            self.target = (
+                max(good, key=lambda point: self.distance_from_cursor(point, cursor))
+                if cursor is not None
+                else good[0]
+            )
+        else:
+            corners = [
+                QPoint(x, y)
+                for x in (min_x, max_x)
+                for y in (min_y, max_y)
+                if points_inward(QPoint(x, y))
+            ]
+            fallback = corners or candidates
+
+            def fallback_score(point: QPoint) -> float:
+                dx, dy = point.x() - self.x(), point.y() - self.y()
+                distance = math.hypot(dx, dy)
+                horizontal = abs(dx) / max(distance, 1.0)
+                cursor_clearance = (
+                    self.distance_from_cursor(point, cursor) if cursor is not None else 0.0
+                )
+                return distance + minimum_distance * horizontal + cursor_clearance
+
+            self.target = max(fallback, key=fallback_score)
+
+        chance = min(max(int(self.config.run_chance), 0), 100) / 100
+        self.roaming_run = random.random() < chance
+        self.reset_roam_motion()
+        if hasattr(self, "animation_timer"):
+            self.animation_timer.setInterval(self.animation_interval(self.current_animation()))
         if random.random() < 0.55:
             self.speak("departing")
 
@@ -700,25 +941,53 @@ class PetWindow(QWidget):
         ):
             return
         if self.target is None:
+            self.movement_tilt_degrees = 0.0
+            self.roaming_run = False
+            self.roam_speed_factor = 0.0
             if now >= self.wait_until:
                 self.choose_target()
+            self.update_movement_debug()
             return
+        roaming_limits = self.roaming_position_limits()
+        if self.clamp_to_limits(self.target, roaming_limits) != self.target:
+            self.choose_target()
+            if self.target is None:
+                return
+        if now - self.last_cursor_replan_at >= 0.5 and self.cursor_is_close():
+            self.choose_target()
+            self.last_cursor_replan_at = now
+            if self.target is None:
+                return
         dx, dy = self.target.x() - self.x(), self.target.y() - self.y()
         distance = math.hypot(dx, dy)
         if distance < 4:
             self.move(self.target)
             self.target = None
+            self.movement_tilt_degrees = 0.0
+            self.roaming_run = False
+            self.roam_speed_factor = 0.0
+            self.roam_position = None
+            self.roam_leg_start = None
             self.wait_until = now + self.config.idle_delay
             self.persist_position()
+            self.update_movement_debug()
             return
-        step = min(distance, self.config.speed * dt)
-        self.move(
-            self.clamp(
-                QPoint(
-                    round(self.x() + dx / distance * step), round(self.y() + dy / distance * step)
-                )
-            )
+        facing = 1.0 if dx >= 0 else -1.0
+        self.movement_tilt_degrees = MAX_ROAM_TILT_DEGREES * dy / distance * facing
+        self.roam_speed_factor = self.roam_easing_factor(distance)
+        gait_multiplier = RUN_SPEED_MULTIPLIER if self.roaming_run else 1.0
+        step = min(distance, self.config.speed * gait_multiplier * self.roam_speed_factor * dt)
+        if self.roam_position is None:
+            self.roam_position = QPointF(self.pos())
+        next_position = QPointF(
+            self.roam_position.x() + dx / distance * step,
+            self.roam_position.y() + dy / distance * step,
         )
+        rounded = QPoint(round(next_position.x()), round(next_position.y()))
+        bounded = self.clamp_to_limits(rounded, roaming_limits)
+        self.move(bounded)
+        self.roam_position = next_position if bounded == rounded else QPointF(bounded)
+        self.update_movement_debug()
 
     def start_showcase(self, seconds_per_state: float) -> None:
         interval_ms = round(min(max(seconds_per_state, 0.5), 10.0) * 1000)
@@ -971,12 +1240,17 @@ class PetWindow(QWidget):
             if command["key"] == "scale":
                 self.config.scale = min(max(float(value), MIN_SCALE), MAX_SCALE)
                 self.apply_size()
-                self.restore_position()
+                self.refresh_position_limits()
             elif command["key"] == "opacity":
                 self.config.opacity = min(max(float(value), MIN_OPACITY), MAX_OPACITY)
                 self.setWindowOpacity(self.config.opacity)
             elif command["key"] == "bounds":
-                self.restore_position()
+                self.refresh_position_limits()
+            elif command["key"] == "run_chance":
+                self.config.run_chance = min(max(int(value), 0), 100)
+            elif command["key"] == "debug_movement":
+                self.config.debug_movement = bool(value)
+                self.update_movement_debug()
             elif command["key"] == "dialogues" and not bool(value):
                 self.bubble.hide()
             elif command["key"] == "dialogue_interval":
@@ -1022,6 +1296,7 @@ class PetWindow(QWidget):
             self.start_showcase(float(command.get("seconds_per_state", 1.2)))
         elif action == "quit":
             QTimer.singleShot(0, QApplication.quit)
+        self.update_movement_debug()
         self.persist_position()
         content = self.scaled_content_rect()
         area = self.work_area()
@@ -1053,6 +1328,7 @@ class PetWindow(QWidget):
                 },
                 "mode_assets": sorted(self.mode_frames),
                 "smooth_animation_assets": sorted(self.animation_frames),
+                "movement_debug": self.movement_debug_state(),
                 "dialogue_visible": self.bubble.isVisible(),
                 "dialogue_text": self.bubble.label.text() if self.bubble.isVisible() else None,
                 "dialogue_window": [
@@ -1150,6 +1426,11 @@ class PetApplication(QApplication):
         self.setProperty("nativeApplicationIconApplied", self.apply_platform_application_icon())
         self.config = load_config()
         self.window = PetWindow(self.config)
+        self._observed_screens: set[int] = set()
+        self.screenAdded.connect(self.register_screen_geometry)
+        self.screenRemoved.connect(self.defer_screen_geometry_refresh)
+        for screen in self.screens():
+            self.register_screen_geometry(screen)
         self.menu = self.create_menu()
         self.window.context_menu = self.menu
         self.server = QLocalServer(self)
@@ -1166,6 +1447,18 @@ class PetApplication(QApplication):
         if self.config.visible:
             self.window.show()
             QTimer.singleShot(0, self.window.apply_platform_window_policy)
+
+    def register_screen_geometry(self, screen: QScreen) -> None:
+        identity = id(screen)
+        if identity not in self._observed_screens:
+            screen.geometryChanged.connect(self.window.screen_geometry_changed)
+            screen.availableGeometryChanged.connect(self.window.screen_geometry_changed)
+            self._observed_screens.add(identity)
+        self.window.screen_geometry_changed()
+
+    def defer_screen_geometry_refresh(self, screen: QScreen) -> None:
+        self._observed_screens.discard(id(screen))
+        QTimer.singleShot(0, self.window.screen_geometry_changed)
 
     def apply_platform_application_icon(self) -> bool:
         if sys.platform != "darwin":

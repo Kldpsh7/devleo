@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "lion-cub-pet"
-version = "0.1.0"
+version = "0.1.1"
 description = "A playful cross-platform desktop lion cub that codes beside you."
 readme = "README.md"
 requires-python = ">=3.11"

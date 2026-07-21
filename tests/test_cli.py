@@ -19,6 +19,7 @@ def test_all_documented_command_groups_parse() -> None:
         ["mood"],
         ["mode", "focus"],
         ["dialogues", "off"],
+        ["debug-movement", "on"],
         ["say", "hello", "human"],
         ["play", "working"],
         ["look", "270"],

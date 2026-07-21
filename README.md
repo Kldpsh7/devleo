@@ -66,6 +66,9 @@ Directional roaming uses clean 16-frame right/left pounce sequences at 85 ms/fra
 - `Quiet Hours` supports immediate meeting silence and an optional daily `HH:MM` schedule, including overnight ranges.
 - `Treats` raise Leo's persisted 0–100 mood. Interacting on consecutive calendar days builds a persisted streak.
 - `Dialogue packs` merge validated local JSON lines into Leo's built-in shuffled categories.
+- `Cursor avoidance` replans away from the pointer when it enters Leo's safety radius.
+- `Run chance` selects a faster pounce cadence independently for each roaming trip.
+- `Movement debugging` overlays live bounds, target vector, gait, speed factor, and pitch.
 
 Laptop state is part of the animation contract:
 
@@ -203,6 +206,7 @@ lion-cub-pet idle-delay <seconds>
 lion-cub-pet run-chance <0-100>
 lion-cub-pet snap-distance <pixels>
 lion-cub-pet avoid-cursor on|off
+lion-cub-pet debug-movement on|off
 ```
 
 ### Animation controls and QA

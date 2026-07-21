@@ -53,6 +53,7 @@ class PetConfig:
     run_chance: int = 35
     snap_distance: int = 48
     avoid_cursor: bool = False
+    debug_movement: bool = False
     animation: str = "auto"
     laptop: str = "auto"
     autostart: bool = False

@@ -2,6 +2,14 @@
 
 All notable changes will be recorded here. The project follows Semantic Versioning after its first public release.
 
+## 0.1.1 - 2026-07-21
+
+- Made roaming targets screen-edge-aware across every Leo size and walking frame.
+- Added directional pitch for upward and downward roaming.
+- Implemented cursor avoidance, per-leg run chance, eased starts/stops, and stronger trip planning.
+- Added automatic roaming-bound refresh when monitor, Dock, taskbar, or display geometry changes.
+- Added an opt-in movement debug overlay and status diagnostics.
+
 ## 0.1.0 - 2026-07-21
 
 - Added cross-platform PySide6 transparent overlay runtime.
